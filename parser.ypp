@@ -1,0 +1,157 @@
+%{
+	#include <iostream>
+	#include "yystype.h"
+	#include "parser_utils.h"
+	#include "hw3_output.hpp"
+	#include <string>
+	// #define YYDEBUG 1
+	// #define YYERROR_VERBOSE 1
+
+    using namespace std;
+	using namespace output;
+
+    int yylex();
+	extern int yylineno;
+    void yyerror(char const*);
+
+%}
+////////////TODO ASK DANIAL///////////////
+
+/* %union{
+	int val;
+	string text;
+}; */
+%nonassoc VOID INT BYTE B BOOL TRUE FALSE
+ 	   RETURN WHILE BREAK CONTINUE SWITCH DEFAULT COLON SC 
+       COMMA LBRACE RBRACE IF CASE HELSE NUM ID STRING
+%nonassoc ELSE
+%right ASSIGN
+%left OR
+%left AND
+%left EQUALITY
+%nonassoc RELOP
+%left ADD SUB
+%left MULT DIV
+%right NOT
+%left LPAREN RPAREN
+
+%%
+
+Program : Funcs 												        {printProductionRule(1);}
+;
+
+Funcs :	/*epsilon*/													        {printProductionRule(2);}
+	  | FuncDecl Funcs 														{printProductionRule(3);}
+;
+
+FuncDecl : RetType ID LPAREN Formals RPAREN LBRACE {prevDefCheck($2->name); addFunDef($1->name, $2->name, $4->pNames, $4->pTypes);} Statements RBRACE 		{exitScope();}
+;
+
+RetType : Type 																{$$ = $1;}
+		| VOID 																{$$ = new Type("VOID");}
+;
+
+Formals : /*epsilon*/														{$$ = new Type("");}
+		| FormalsList 														{$$ = $1;}
+;
+
+FormalsList : FormalDecl 													{$$ = $1;}
+			| FormalDecl COMMA FormalsList 									{$$ = $3; $$->pNames.push_back($1->pNames[0]); $$->pTypes.push_back($1->pTypes[0]);}
+;
+
+FormalDecl : Type ID 														{$$ = new Formals($2->name, $1->name);}
+;
+
+Statements : Statment 														{printProductionRule(12);}
+		   | Statements Statment 											{printProductionRule(13);}
+;
+
+Statment : LBRACE {enterScope("");} Statements RBRACE 		{exitScope();}
+		 | Type ID SC 														{prevDefCheck($2->name); addVarToSymTable($1->name, $2->name, 0);}
+		 | Type ID ASSIGN Exp SC 											{prevDefCheck($2->name); checkTypeMatch($1->name, $4->type); addVarToSymTable($1->name, $2->name, $4->val);}
+		 | ID ASSIGN Exp SC 												{ checkTypeMatch(getTypeById($1->name), $3->type);  changeValOfVar($1->name, $3->val);}
+		 | Call SC 															{printProductionRule(18);}
+		 | RETURN SC 														{checkRetMatchesFunc("");}
+		 | RETURN Exp SC 													{checkRetMatchesFunc($2->type);}
+		 | IF LPAREN Exp M1 RPAREN M2 Statment M3 %prec HELSE 									
+		 | IF LPAREN Exp M1 RPAREN M2 Statment M3 ELSE {enterScope("");} Statment {exitScope();} 						
+		 | WHILE LPAREN Exp M1 RPAREN M4 Statment M3 								
+		 | BREAK SC 														{checkBreak();}
+		 | CONTINUE SC 														{checkContinue();}
+		 | SWITCH LPAREN Exp {checkRelop($3, $3);} RPAREN LBRACE {enterScope("SWITCH");} CaseList RBRACE {exitScope();}                 {printProductionRule(26);}
+;
+
+M1 : /* epsilon */															{YYSTYPE e = yyvsp[0]; checkBool(e, e);}											
+;
+
+M2 : /* epsilon */															{enterScope("");}											
+;
+
+M3 : /* epsilon */															{exitScope();}											
+;
+
+M4 : /* epsilon */															{enterScope("WHILE");}											
+;
+
+Call : ID LPAREN ExpList RPAREN 											{$$ = funCall($1->name, $3->pTypes);}
+	 | ID LPAREN RPAREN 													{$$ = funCall($1->name, std::vector<std::string>());}
+;
+
+ExpList : Exp 																{$1->pTypes.push_back($1->type); $$ = $1;}
+		| Exp COMMA ExpList 												{$3->pTypes.push_back($1->type); $$ = $3;}
+;
+
+Type : INT 																	{$$ = new Type("INT");}
+	 | BYTE 																{$$ = new Type("BYTE");}
+     | BOOL 																{$$ = new Type("BOOL");}
+;
+
+
+Exp : LPAREN Exp RPAREN 													{$$ = $2;}
+    | Exp ADD Exp 														{$$ = doBinop($1, $3, "+");}
+    | Exp SUB Exp 														{$$ = doBinop($1, $3, "-");}
+    | Exp MULT Exp 														{$$ = doBinop($1, $3, "*");}
+    | Exp DIV Exp 														{$$ = doBinop($1, $3, "/");}
+	| ID 																	{$$ = getById($1);}
+	| Call 																	{printProductionRule(37);}
+	| NUM 																	{$$ = $1;}
+	| NUM B 																{checkByte($1->val); $$ = $1; $$->type = "BYTE";}
+	| STRING 																{$$ = $1;}
+	| TRUE 																	{$$ = $1;}
+	| FALSE 																{$$ = $1;}
+	| NOT Exp 																{checkNot($2); $$ = $2;}
+	| Exp AND Exp 															{checkBool($1,$3); $$ = $1;}
+	| Exp OR Exp 															{checkBool($1,$3); $$ = $1;}
+	| Exp RELOP Exp 												    	{checkRelop($1, $3); $$ = new Exp("BOOL");}
+	| Exp EQUALITY Exp 												    	{checkRelop($1, $3); $$ = new Exp("BOOL");}
+;
+
+CaseList : CaseDecl CaseList	                                            {printProductionRule(48);}
+		 | CaseDecl	                                                        {printProductionRule(49);}
+		 | DEFAULT COLON Statements	                                        {printProductionRule(50);}
+
+CaseDecl : CASE NUM COLON Statements	                                    {printProductionRule(51);}
+
+
+
+%%
+
+
+////////////TODO ASK DANIAL///////////////
+
+int main()
+{
+	/* yydebug = 1; */
+	enterScope("");
+	addFunDefPrint("VOID", "print", std::vector<std::string>(), std::vector<std::string>{"STRING"} );
+	addFunDefPrint("VOID", "printi", std::vector<std::string>(), std::vector<std::string>{"INT"} );
+	int parseRes = yyparse();
+	checkForMain();
+	exitScope();
+    return parseRes;
+}
+
+void yyerror(char const* s){
+	errorSyn(yylineno);
+	exit(0);
+}

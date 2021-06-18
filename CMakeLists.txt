@@ -3,4 +3,4 @@ project(hw5)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(hw5 main.cpp)
+add_executable(hw5 bp.cpp hw3_output.cpp parser_utils.cpp symbol_table.cpp yystype.cpp)
