@@ -1,4 +1,4 @@
 void main(){
     int x;
-    x = 3 b / 4 b;
+    x = 3 / 0 b;
 }

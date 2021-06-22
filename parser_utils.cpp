@@ -27,6 +27,7 @@ void exitScope() {
 void addVarToSymTable(std::string type, std::string id, int val) {
     symTableStack.back().insert(id, type, val, offsetStack.back());
     offsetStack.back()++;
+    assigntoNewVar(offset,)
 }
 
 void printProductionRule(int a) {
@@ -130,7 +131,7 @@ Node *doBinop(Node *lhs, Node *rhs, std::string op) {
     }
 
     std::string lval = lhs->reg.empty() ? std::to_string(lhs->val) : lhs->reg;
-    std::string rval = lhs->reg.empty() ? std::to_string(lhs->val) : lhs->reg;
+    std::string rval = rhs->reg.empty() ? std::to_string(rhs->val) : rhs->reg;
 
     ret->reg = CodeBuffer::instance().doBinop(lval, rval, lType, rType, op);
 

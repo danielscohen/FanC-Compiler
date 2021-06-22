@@ -10,21 +10,24 @@ ret void
 }
 define void @print(i8*) {
 %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
-declare i32 @printf(i8*, ...)
 call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
 ret void
 }
+define i32 @main(){
+start:
 %lVars = alloca [50 x i32]
 %reg0 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
 store i32 0, i32* %reg0
-%reg1 = icmp eq i32 0, 3
+%reg1 = icmp eq i32 0, 0
 br i1 %reg1, label %Div0, label %NotDiv0
 Div0:
 %temp = getelementptr [22 x i8], [22 x i8]* @divZeroText, i32 0, i32 0
 call void @print(i8* %temp)
-call void @exit(i8* 0)
-ret
+call void @exit(i32 0)
+br label %NotDiv0
 NotDiv0:
-%reg2 = sdiv i32 3, 3
-%reg3 = trunc i32 %reg2 to i8
-%reg4 = zext i8 %reg3 to i32
+%reg2 = sdiv i32 3, 0
+
+ret i32 0
+        
+}

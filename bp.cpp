@@ -105,6 +105,12 @@ void CodeBuffer::setVar(int offset, int val) {
 
 std::string CodeBuffer::getVar(int offset) {
     std::stringstream str;
+    if(offset < 0){
+        str << "%";
+        str << (-offset-1);
+        std::string ret(str.str());
+        return ret;
+    }
     str << genReg();
     std::string ret(str.str());
     str << " = load i32, i32* ";
@@ -131,8 +137,8 @@ CodeBuffer::doBinop(std::string lVal, std::string rVal, std::string lType, std::
         emit("Div0:");
         emit("%temp = getelementptr [22 x i8], [22 x i8]* @divZeroText, i32 0, i32 0");
         emit("call void @print(i8* %temp)");
-        emit("call void @exit(i8* 0)");
-        emit("ret");
+        emit("call void @exit(i32 0)");
+        emit("br label %NotDiv0");
         emit("NotDiv0:");
     }
     std::stringstream str;
@@ -178,7 +184,6 @@ void CodeBuffer::addBegCodetoBuffer() {
     emit("}");
     emit("define void @print(i8*) {");
     emit("%spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0");
-    emit("declare i32 @printf(i8*, ...)");
     emit("call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)");
     emit("ret void");
     emit("}");
