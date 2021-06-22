@@ -61,6 +61,7 @@ public:
     void initLocalVars();
     std::string getVarAddr(int offset);
     void setVar(int offset, int val = 0);
+    std::string getVar(int offset);
     std::string genReg();
 };
 

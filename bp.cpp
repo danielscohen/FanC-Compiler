@@ -103,6 +103,16 @@ void CodeBuffer::setVar(int offset, int val) {
     emit(str.str());
 }
 
+std::string CodeBuffer::getVar(int offset) {
+    std::stringstream str;
+    str << genReg();
+    std::string ret(str.str());
+    str << " = load i32, i32* ";
+    str << getVarAddr(offset);
+    emit(str.str());
+    return ret;
+}
+
 // ******** Helper Methods ********** //
 bool replace(string& str, const string& from, const string& to, const BranchLabelIndex index) {
 	size_t pos;
