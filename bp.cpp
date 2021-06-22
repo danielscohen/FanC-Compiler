@@ -23,6 +23,15 @@ string CodeBuffer::genLabel(){
 	return ret;
 }
 
+string CodeBuffer::genReg(){
+    static int regId = 0;
+    std::stringstream reg;
+    reg << "%reg";
+    reg << regId++;
+    std::string ret(reg.str());
+    return ret;
+}
+
 int CodeBuffer::emit(const string &s){
     buffer.push_back(s);
 	return buffer.size() - 1;
@@ -72,7 +81,26 @@ void CodeBuffer::printGlobalBuffer()
 }
 
 void CodeBuffer::initLocalVars() {
-    emit("%lVars = alloca [50 x i32], i32 0");
+    emit("%lVars = alloca [50 x i32]");
+}
+
+std::string CodeBuffer::getVarAddr(int offset) {
+    std::stringstream str;
+    str << genReg();
+    std::string ret(str.str());
+    str << " = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 ";
+    str << offset;
+    emit(str.str());
+    return ret;
+}
+
+void CodeBuffer::setVar(int offset, int val) {
+    std::stringstream str;
+    str << "store i32 ";
+    str << val;
+    str << ", i32* ";
+    str << getVarAddr(offset);
+    emit(str.str());
 }
 
 // ******** Helper Methods ********** //

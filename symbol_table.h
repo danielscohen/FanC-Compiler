@@ -44,6 +44,7 @@ public:
     bool isfunction(std::string name);
     YYSTYPE getById(std::string name);
     std::string getTypeById(std::string name);
+    int getOffset(std::string name);
     void setVal(std::string name, int val);
     std::string getRetTypeById(std::string name);
     void checkRetMatchesFunc(std::string type);

@@ -9,6 +9,7 @@
 #include "symbol_table.h"
 #include <vector>
 #include "parser.tab.hpp"
+#include "bp.hpp"
 
 
 extern std::vector<SymbolTable> symTableStack;
@@ -44,6 +45,7 @@ void checkBreak();
 void checkContinue();
 void checkForMain();
 void checkByte(int val);
+void initVar(const std::string& name);
 
 
 

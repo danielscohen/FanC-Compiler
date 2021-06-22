@@ -119,3 +119,7 @@ void SymbolTable::checkForMain() {
     output::errorMainMissing();
     exit(0);
 }
+
+int SymbolTable::getOffset(std::string name) {
+    return table.find(name)->second.offset;
+}

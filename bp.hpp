@@ -59,6 +59,9 @@ public:
 	void printGlobalBuffer();
 
     void initLocalVars();
+    std::string getVarAddr(int offset);
+    void setVar(int offset, int val = 0);
+    std::string genReg();
 };
 
 #endif

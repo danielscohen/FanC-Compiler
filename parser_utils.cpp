@@ -243,6 +243,16 @@ void checkByte(int val) {
     }
 }
 
+void initVar(const string &name) {
+    int offset;
+    for(SymbolTable& table : symTableStack){
+        if(table.existsInTable(name)){
+            offset = table.getOffset(name);
+        }
+    }
+    CodeBuffer::instance().setVar(offset);
+}
+
 
 
 
