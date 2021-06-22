@@ -170,7 +170,7 @@ void CodeBuffer::addBegCodetoBuffer() {
     emit("declare void @exit(i32)");
     emit("@.int_specifier = constant [4 x i8] c\"%d\\0A\\00\"");
     emit("@.str_specifier = constant [4 x i8] c\"%s\\0A\\00\"");
-    emit("@divZeroText = constant [22 x i8] c\"Error division by zero");
+    emit("@divZeroText = constant [22 x i8] c\"Error division by zero\"");
     emit("define void @printi(i32) {");
     emit("%spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0");
     emit("call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)");
