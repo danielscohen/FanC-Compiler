@@ -46,6 +46,7 @@ void checkContinue();
 void checkForMain();
 void checkByte(int val);
 void initVar(const std::string& name);
+void initVarStack();
 
 
 

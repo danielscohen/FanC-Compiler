@@ -67,7 +67,7 @@ vector<pair<int,BranchLabelIndex>> CodeBuffer::merge(const vector<pair<int,Branc
 }
 
 // ******** Methods to handle the global section ********** //
-void CodeBuffer::emitGlobal(const std::string& dataLine) 
+void CodeBuffer::emitGlobal(const std::string& dataLine)
 {
 	globalDefs.push_back(dataLine);
 }
@@ -80,7 +80,7 @@ void CodeBuffer::printGlobalBuffer()
 	}
 }
 
-void CodeBuffer::initLocalVars() {
+void CodeBuffer::initVarStack() {
     emit("%lVars = alloca [50 x i32]");
 }
 
@@ -111,6 +111,78 @@ std::string CodeBuffer::getVar(int offset) {
     str << getVarAddr(offset);
     emit(str.str());
     return ret;
+}
+
+std::string
+CodeBuffer::doBinop(std::string lVal, std::string rVal, std::string lType, std::string rType, std::string op) {
+    if(op == "sdiv"){
+        std::stringstream str;
+        str << genReg();
+        std::string temp(str.str());
+        str << " = icmp eq i32 0, ";
+        str << rVal;
+        emit(str.str());
+        str.str("");
+        str << "br i1 ";
+        str << temp;
+        str << ", label %Div0, label %NotDiv0";
+        emit(str.str());
+        str.str("");
+        emit("Div0:");
+        emit("%temp = getelementptr [22 x i8], [22 x i8]* @divZeroText, i32 0, i32 0");
+        emit("call void @print(i8* %temp)");
+        emit("call void @exit(i8* 0)");
+        emit("ret");
+        emit("NotDiv0:");
+    }
+    std::stringstream str;
+    str << genReg();
+    std::string ret(str.str());
+    str << " = ";
+    str << op;
+    str << " i32 ";
+    str << lVal;
+    str << ", ";
+    str << rVal;
+    emit(str.str());
+    if(lType == "BYTE" && rType == "BYTE"){
+        str.str("");
+        str << genReg();
+        std::string temp(str.str());
+        str << " = trunc i32 ";
+        str << ret;
+        str << " to i8";
+        emit(str.str());
+
+        str.str("");
+        str << genReg();
+        ret = str.str();
+        str << " = zext i8 ";
+        str << temp;
+        str << " to i32";
+        emit(str.str());
+    }
+    return ret;
+}
+
+void CodeBuffer::addBegCodetoBuffer() {
+    emit("declare i32 @printf(i8*, ...)");
+    emit("declare void @exit(i32)");
+    emit("@.int_specifier = constant [4 x i8] c\"%d\\0A\\00\"");
+    emit("@.str_specifier = constant [4 x i8] c\"%s\\0A\\00\"");
+    emit("@divZeroText = constant [22 x i8] c\"Error division by zero");
+    emit("define void @printi(i32) {");
+    emit("%spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0");
+    emit("call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)");
+    emit("ret void");
+    emit("}");
+    emit("define void @print(i8*) {");
+    emit("%spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0");
+    emit("declare i32 @printf(i8*, ...)");
+    emit("call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)");
+    emit("ret void");
+    emit("}");
+
 }
 
 // ******** Helper Methods ********** //

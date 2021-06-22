@@ -10,15 +10,13 @@ define void @printi(i32) {
 }
 define i32 @main(){
     start:
-        %fp = alloca [50 x i32], i32 0
-        %ptr = getelementptr [50 x i32], [50 x i32]* %fp, i32 0, i32 1
-        %ptr0 = getelementptr [50 x i32], [50 x i32]* %fp, i32 0, i32 0
-        store i32 1, i32* %ptr0
-        store i32 2, i32* %ptr
-        %arg1 = load i32, i32* %ptr0
-        %arg2 = load i32, i32* %ptr
-        %sum = add i32 %arg1, %arg2
-        call void @printi(i32 %sum)
+        %lVars = alloca [50 x i32]
+        %reg0 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
+        store i32 0, i32* %reg0
+        %ptr = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
+        %arg = load i32, i32* %ptr
+        %res = add i32 0, %arg
+        call void @printi(i32 %res)
         ret i32 0
         
 }

@@ -58,11 +58,13 @@ public:
 	//print the content of the global buffer to stdout
 	void printGlobalBuffer();
 
-    void initLocalVars();
+    void initVarStack();
     std::string getVarAddr(int offset);
     void setVar(int offset, int val = 0);
     std::string getVar(int offset);
     std::string genReg();
+    std::string doBinop(std::string lVal, std::string rVal, std::string lType, std::string rType, std::string op);
+    void addBegCodetoBuffer();
 };
 
 #endif

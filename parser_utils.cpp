@@ -19,7 +19,7 @@ void enterScope(std::string scopeType) {
 }
 
 void exitScope() {
-    symTableStack.back().printTable();
+//    symTableStack.back().printTable();
     symTableStack.pop_back();
     offsetStack.pop_back();
 }
@@ -116,8 +116,7 @@ void checkNot(YYSTYPE y) {
 Node *doBinop(Node *lhs, Node *rhs, std::string op) {
     std::string lType = lhs->type;
     std::string rType = rhs->type;
-//    int lVal = lhs->val;
-//    int rVal = rhs->val;
+
     if((rType != "INT" && rType != "BYTE") || (lType != "INT" && lType != "BYTE")){
         output::errorMismatch(yylineno);
         exit(0);
@@ -130,15 +129,10 @@ Node *doBinop(Node *lhs, Node *rhs, std::string op) {
         ret->type = "BYTE";
     }
 
-//    if(op == "+") ret->val = lVal + rVal;
-//    else if (op == "-") ret->val = lVal - rVal;
-//    else if (op == "*") ret->val = lVal * rVal;
-//    else ret->val = lVal / rVal;
-//
-//    if(ret->type == "BYTE" && ret->val > 255){
-//        output::errorByteTooLarge(yylineno, std::to_string(ret->val));
-//        exit(0);
-//    }
+    std::string lval = lhs->reg.empty() ? std::to_string(lhs->val) : lhs->reg;
+    std::string rval = lhs->reg.empty() ? std::to_string(lhs->val) : lhs->reg;
+
+    ret->reg = CodeBuffer::instance().doBinop(lval, rval, lType, rType, op);
 
     return ret;
 }
@@ -165,7 +159,10 @@ Node *getById(Node *id) {
             output::errorUndef(yylineno, name);
             exit(0);
         }
-        return table.getById(name);
+        std::string reg = CodeBuffer::instance().getVar(table.getOffset(name));
+        Node* ret = table.getById(name);
+        ret->reg = reg;
+        return ret;
     }
     output::errorUndef(yylineno, name);
     exit(0);
@@ -251,6 +248,10 @@ void initVar(const string &name) {
         }
     }
     CodeBuffer::instance().setVar(offset);
+}
+
+void initVarStack() {
+    CodeBuffer::instance().initVarStack();
 }
 
 

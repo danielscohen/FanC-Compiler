@@ -14,6 +14,7 @@ struct Node {
     int val;
     std::string name;
     std::string type;
+    std::string reg;
     std::vector<std::string> pNames;
     std::vector<std::string> pTypes;
 
