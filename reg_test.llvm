@@ -1,0 +1,24 @@
+declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+
+define void @printi(i32) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+    ret void
+}
+define i32 @main(){
+    start:
+        %fp = alloca [50 x i32], i32 0
+        %ptr = getelementptr [50 x i32], [50 x i32]* %fp, i32 0, i32 1
+        %ptr0 = getelementptr [50 x i32], [50 x i32]* %fp, i32 0, i32 0
+        store i32 1, i32* %ptr0
+        store i32 2, i32* %ptr
+        %arg1 = load i32, i32* %ptr0
+        %arg2 = load i32, i32* %ptr
+        %sum = add i32 %arg1, %arg2
+        call void @printi(i32 %sum)
+        ret i32 0
+        
+}

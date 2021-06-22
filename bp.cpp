@@ -71,6 +71,10 @@ void CodeBuffer::printGlobalBuffer()
 	}
 }
 
+void CodeBuffer::initLocalVars() {
+    emit("%lVars = alloca [50 x i32], i32 0");
+}
+
 // ******** Helper Methods ********** //
 bool replace(string& str, const string& from, const string& to, const BranchLabelIndex index) {
 	size_t pos;
