@@ -56,8 +56,12 @@ PrintableChars		([\x20-\x7E]|{WhiteSpace})
 \{                            return LBRACE;
 \}                            return RBRACE;
 \=                            return ASSIGN;
-(<)|(>)|(<=)|(>=)   return RELOP;
-(==)|(!=)   return EQUALITY;
+(<)                           return LT;
+(<=)                           return LTE;
+(>)                           return GT;
+(>=)                           return GTE;
+(==)   return EQUAL;
+(!=)   return NEQUAL;
 \+                         return ADD;
 \-                         return SUB;
 \*                         return MULT;

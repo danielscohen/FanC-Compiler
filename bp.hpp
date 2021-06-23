@@ -65,6 +65,10 @@ public:
     std::string genReg();
     std::string doBinop(std::string lVal, std::string rVal, std::string lType, std::string rType, std::string op);
     void addBegCodetoBuffer();
+
+    std::vector<std::pair<int, BranchLabelIndex>> doList();
+    int doRelop(std::string regL, std::string regR, std::string op);
+
 };
 
 #endif

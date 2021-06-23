@@ -27,7 +27,6 @@ void exitScope() {
 void addVarToSymTable(std::string type, std::string id, int val) {
     symTableStack.back().insert(id, type, val, offsetStack.back());
     offsetStack.back()++;
-    assigntoNewVar(offset,)
 }
 
 void printProductionRule(int a) {
@@ -241,18 +240,26 @@ void checkByte(int val) {
     }
 }
 
-void initVar(const string &name) {
+void initVar(const string &name, int val) {
     int offset;
     for(SymbolTable& table : symTableStack){
         if(table.existsInTable(name)){
             offset = table.getOffset(name);
         }
     }
-    CodeBuffer::instance().setVar(offset);
+    CodeBuffer::instance().setVar(offset, val);
 }
 
 void initVarStack() {
     CodeBuffer::instance().initVarStack();
+}
+
+std::vector<std::pair<int, BranchLabelIndex>> doList() {
+    return CodeBuffer::instance().doList();
+}
+
+int doRelop(std::string regL, std::string regR, std::string op) {
+    return CodeBuffer::instance().doRelop(regL, regR, op);
 }
 
 

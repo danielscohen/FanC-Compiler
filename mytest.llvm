@@ -13,21 +13,17 @@ define void @print(i8*) {
 call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
 ret void
 }
-define i32 @main(){
-start:
 %lVars = alloca [50 x i32]
 %reg0 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
-store i32 0, i32* %reg0
-%reg1 = icmp eq i32 0, 0
-br i1 %reg1, label %Div0, label %NotDiv0
-Div0:
-%temp = getelementptr [22 x i8], [22 x i8]* @divZeroText, i32 0, i32 0
-call void @print(i8* %temp)
-call void @exit(i32 0)
-br label %NotDiv0
-NotDiv0:
-%reg2 = sdiv i32 3, 0
-
-ret i32 0
-        
-}
+store i32 3, i32* %reg0
+%reg1 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 1
+store i32 4, i32* %reg1
+%reg3 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
+%reg2 = load i32, i32* %reg3
+%reg5 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 1
+%reg4 = load i32, i32* %reg5
+%tmp = icmp slt i32 %reg2, %reg4
+br i1 %tmp, label %label_26, label %label_28
+label_26:
+br label @
+label_28:

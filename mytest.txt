@@ -1,4 +1,5 @@
 void main(){
-    int x;
-    x = 3 / 0 b;
+    int x = 3;
+    int y = 4;
+    if(x<y) printi(300313); else printi(324626345);
 }

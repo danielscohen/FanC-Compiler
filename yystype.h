@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include "bp.hpp"
 
 struct Node {
 
@@ -15,6 +16,12 @@ struct Node {
     std::string name;
     std::string type;
     std::string reg;
+    std::vector<std::pair<int, BranchLabelIndex>> trueList;
+    std::vector<std::pair<int, BranchLabelIndex>> falseList;
+    std::vector<std::pair<int, BranchLabelIndex>> nextList;
+    std::vector<std::pair<int, BranchLabelIndex>> breakList;
+    std::string label;
+    std::string label2;
     std::vector<std::string> pNames;
     std::vector<std::string> pTypes;
 

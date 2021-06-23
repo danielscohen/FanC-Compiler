@@ -190,6 +190,24 @@ void CodeBuffer::addBegCodetoBuffer() {
 
 }
 
+std::vector<std::pair<int, BranchLabelIndex>> CodeBuffer::doList() {
+
+    int addr = emit("br label @");
+    return makelist(std::pair<int, BranchLabelIndex>(addr, FIRST));
+}
+
+int CodeBuffer::doRelop(std::string regL, std::string regR, std::string op) {
+    std::stringstream str;
+    str << "%tmp = icmp ";
+    str << op;
+    str << " i32 ";
+    str << regL;
+    str << ", ";
+    str << regR;
+    emit(str.str());
+    return emit("br i1 %tmp, label @, label @");
+}
+
 // ******** Helper Methods ********** //
 bool replace(string& str, const string& from, const string& to, const BranchLabelIndex index) {
 	size_t pos;

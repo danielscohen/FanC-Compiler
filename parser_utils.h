@@ -45,8 +45,10 @@ void checkBreak();
 void checkContinue();
 void checkForMain();
 void checkByte(int val);
-void initVar(const std::string& name);
+void initVar(const string &name, int val);
 void initVarStack();
+std::vector<std::pair<int, BranchLabelIndex>> doList();
+int doRelop(std::string regL, std::string regR, std::string op);
 
 
 

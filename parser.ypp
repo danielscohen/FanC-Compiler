@@ -7,6 +7,7 @@
 	#include <string>
 	// #define YYDEBUG 1
 	// #define YYERROR_VERBOSE 1
+	#define BUFF CodeBuffer::instance()
 
     using namespace std;
 	using namespace output;
@@ -14,6 +15,7 @@
     int yylex();
 	extern int yylineno;
     void yyerror(char const*);
+	typedef std::pair<int, BranchLabelIndex> addrPair;
 
 %}
 ////////////TODO ASK DANIAL///////////////
@@ -29,8 +31,8 @@
 %right ASSIGN
 %left OR
 %left AND
-%left EQUALITY
-%nonassoc RELOP
+%left EQUAL NEQUAL
+%nonassoc LT LTE GT GTE
 %left ADD SUB
 %left MULT DIV
 %right NOT
@@ -68,18 +70,29 @@ Statements : Statment 														{printProductionRule(12);}
 ;
 
 Statment : LBRACE {enterScope("");} Statements RBRACE 		{exitScope();}
-		 | Type ID SC 														{prevDefCheck($2->name); addVarToSymTable($1->name, $2->name, 0); initVar($2->name);}
-		 | Type ID ASSIGN Exp SC 											{prevDefCheck($2->name); checkTypeMatch($1->name, $4->type); addVarToSymTable($1->name, $2->name, $4->val);}
-		 | ID ASSIGN Exp SC 												{ checkTypeMatch(getTypeById($1->name), $3->type);  changeValOfVar($1->name, $3->val);}
+		 | Type ID SC 														{prevDefCheck($2->name); addVarToSymTable($1->name, $2->name, 0); initVar($2->name, 0);}
+		 | Type ID ASSIGN Exp SC 											{prevDefCheck($2->name); checkTypeMatch($1->name, $4->type); addVarToSymTable($1->name, $2->name, $4->val); initVar($2->name, $4->val);}
+		 | ID ASSIGN Exp SC 												{ checkTypeMatch(getTypeById($1->name), $3->type);  changeValOfVar($1->name, $3->val); initVar($1->name, $3->val);}
 		 | Call SC 															{printProductionRule(18);}
 		 | RETURN SC 														{checkRetMatchesFunc("");}
 		 | RETURN Exp SC 													{checkRetMatchesFunc($2->type);}
-		 | IF LPAREN Exp M1 RPAREN M2 Statment M3 %prec HELSE 									
-		 | IF LPAREN Exp M1 RPAREN M2 Statment M3 ELSE {enterScope("");} Statment {exitScope();} 						
-		 | WHILE LPAREN Exp M1 RPAREN M4 Statment M3 								
-		 | BREAK SC 														{checkBreak();}
-		 | CONTINUE SC 														{checkContinue();}
+		 | IF LPAREN Exp M1 RPAREN M M2 Statment M3 %prec HELSE 				{BUFF.bpatch($3->trueList, $6->label); $$ = new Exp("");
+		 																	$$->nextList = BUFF.merge($3->falseList, $8->nextList);}								
+		 | IF LPAREN Exp M1 RPAREN M M2 Statment M3 ELSE N M M2 Statment M3		{BUFF.bpatch($3->trueList, $6->label);	$$ = new Exp("");
+																					BUFF.bpatch($3->falseList, $12->label);
+																					std::vector<addrPair> temp = BUFF.merge($8->nextList, $10->nextList);
+																					$$->nextList = BUFF.merge(temp, $14->nextList);}
+		 | WHILE M LPAREN Exp M1 RPAREN M M4 Statment M3 							{BUFF.bpatch($9->nextList, $2->label); BUFF.bpatch($4->trueList, $7->label);
+																					$$ = new Exp(""); $$->nextList = BUFF.merge($4->falseList, $9->breakList); BUFF.emit("br label " + $2->label);}	
+		 | BREAK SC 														{checkBreak(); int addr = BUFF.emit("br label @"); $$ = new Exp(""); $$->breakList = BUFF.makelist(addrPair(addr, FIRST));}
+		 | CONTINUE SC 														{checkContinue(); int addr = BUFF.emit("br label @"); $$ = new Exp(""); $$->nextList = BUFF.makelist(addrPair(addr, FIRST));}
 		 | SWITCH LPAREN Exp {checkRelop($3, $3);} RPAREN LBRACE {enterScope("SWITCH");} CaseList RBRACE {exitScope();}                 {printProductionRule(26);}
+;
+
+N : /* epsilon */															{$$ = new Exp(""); int addr = BUFF.emit("br label @"); $$->nextList = BUFF.makelist(addrPair(addr, FIRST));}											
+;
+
+M : /* epsilon */															{$$ = new Exp(""); $$->label = BUFF.genLabel();}											
 ;
 
 M1 : /* epsilon */															{YYSTYPE e = yyvsp[0]; checkBool(e, e);}											
@@ -118,13 +131,33 @@ Exp : LPAREN Exp RPAREN 													{$$ = $2;}
 	| NUM 																	{$$ = $1;}
 	| NUM B 																{checkByte($1->val); $$ = $1; $$->type = "BYTE";}
 	| STRING 																{$$ = $1;}
-	| TRUE 																	{$$ = $1;}
-	| FALSE 																{$$ = $1;}
-	| NOT Exp 																{checkNot($2); $$ = $2;}
-	| Exp AND Exp 															{checkBool($1,$3); $$ = $1;}
-	| Exp OR Exp 															{checkBool($1,$3); $$ = $1;}
-	| Exp RELOP Exp 												    	{checkRelop($1, $3); $$ = new Exp("BOOL");}
-	| Exp EQUALITY Exp 												    	{checkRelop($1, $3); $$ = new Exp("BOOL");}
+	| TRUE 																	{$$ = $1; $$->trueList = doList();}
+	| FALSE 																{$$ = $1; $$->falseList = doList();}
+	| NOT Exp 																{checkNot($2); $$ = $2; $$->trueList = $2->falseList; $$->falseList = $2->trueList;}
+	| Exp AND {$$ = new Exp("BOOL"); $$->label = BUFF.genLabel();} Exp 			{checkBool($1,$3);  BUFF.bpatch($1->trueList, $3->label);
+																									$$->trueList = $4->trueList;
+																									$$->falseList = BUFF.merge($1->falseList, $4->falseList);}
+	| Exp OR {$$ = new Exp("BOOL"); $$->label = BUFF.genLabel();} Exp 			{checkBool($1,$3);  BUFF.bpatch($1->falseList, $3->label);
+																									$$->trueList = BUFF.merge($1->trueList, $4->trueList);
+																									$$->falseList = $4->falseList;}
+	| Exp LT Exp 												    	{checkRelop($1, $3); $$ = new Exp("BOOL"); int addr = doRelop($1->reg, $3->reg, "slt");
+																									$$->trueList = BUFF.makelist(addrPair(addr, FIRST));
+																									$$->falseList = BUFF.makelist(addrPair(addr, SECOND)); }
+	| Exp LTE Exp 												    	{checkRelop($1, $3); $$ = new Exp("BOOL"); int addr = doRelop($1->reg, $3->reg, "sle");
+																									$$->trueList = BUFF.makelist(addrPair(addr, FIRST));
+																									$$->falseList = BUFF.makelist(addrPair(addr, SECOND)); }
+	| Exp GT Exp 												    	{checkRelop($1, $3); $$ = new Exp("BOOL"); int addr = doRelop($1->reg, $3->reg, "sgt");
+																									$$->trueList = BUFF.makelist(addrPair(addr, FIRST));
+																									$$->falseList = BUFF.makelist(addrPair(addr, SECOND)); }
+	| Exp GTE Exp 												    	{checkRelop($1, $3); $$ = new Exp("BOOL"); int addr = doRelop($1->reg, $3->reg, "sge");
+																									$$->trueList = BUFF.makelist(addrPair(addr, FIRST));
+																									$$->falseList = BUFF.makelist(addrPair(addr, SECOND)); }
+	| Exp EQUAL Exp 												    	{checkRelop($1, $3); $$ = new Exp("BOOL"); int addr = doRelop($1->reg, $3->reg, "eq");
+																									$$->trueList = BUFF.makelist(addrPair(addr, FIRST));
+																									$$->falseList = BUFF.makelist(addrPair(addr, SECOND)); }
+	| Exp NEQUAL Exp 												    	{checkRelop($1, $3); $$ = new Exp("BOOL"); int addr = doRelop($1->reg, $3->reg, "ne");
+																									$$->trueList = BUFF.makelist(addrPair(addr, FIRST));
+																									$$->falseList = BUFF.makelist(addrPair(addr, SECOND)); }
 ;
 
 CaseList : CaseDecl CaseList	                                            {printProductionRule(48);}
@@ -146,11 +179,11 @@ int main()
 	enterScope("");
 	addFunDefPrint("VOID", "print", std::vector<std::string>(), std::vector<std::string>{"STRING"} );
 	addFunDefPrint("VOID", "printi", std::vector<std::string>(), std::vector<std::string>{"INT"} );
-	CodeBuffer::instance().addBegCodetoBuffer();
+	BUFF.addBegCodetoBuffer();
 	int parseRes = yyparse();
 	checkForMain();
 	exitScope();
-	CodeBuffer::instance().printCodeBuffer();
+	BUFF.printCodeBuffer();
     return parseRes;
 }
 
