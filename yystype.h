@@ -24,6 +24,8 @@ struct Node {
     std::string label2;
     std::vector<std::string> pNames;
     std::vector<std::string> pTypes;
+    bool noRet = true;
+    std::string funcPStr;
 
     Node(int val, std::string text, std::string type);
 };

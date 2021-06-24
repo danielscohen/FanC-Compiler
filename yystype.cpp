@@ -16,7 +16,7 @@ Formals::Formals(std::string name, std::string type) : Node(0, "", "") {
 
 
 Node::Node(int val, std::string name, std::string type)
-: val(val), name(name), type(type) {
+: val(val), name(name), type(type), noRet(true) {
 }
 
 Exp::Exp(std::string type) : Node(0,"", type) {

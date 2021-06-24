@@ -1,5 +1,3 @@
 void main(){
-    int x = 3;
-    int y = 4;
-    if(x<y) printi(300313); else printi(324626345);
+    if(3<4) printi(1); 
 }

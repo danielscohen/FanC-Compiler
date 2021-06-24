@@ -6,6 +6,8 @@
 #include "hw3_output.hpp"
 #include <iostream>
 #include <algorithm>
+#include <sstream>
+
 std::vector<SymbolTable> symTableStack;
 std::vector<int> offsetStack;
 
@@ -261,6 +263,41 @@ std::vector<std::pair<int, BranchLabelIndex>> doList() {
 int doRelop(std::string regL, std::string regR, std::string op) {
     return CodeBuffer::instance().doRelop(regL, regR, op);
 }
+
+std::string getpTypesStr(std::vector<std::string> pTypes) {
+    std::stringstream str;
+    str << "(";
+    for(int i =0; i < (int)pTypes.size(); i++){
+        str << pTypes[i];
+        if(i != pTypes.size() - 1){
+            str << ", ";
+        }
+    }
+    str << ")";
+    return  str.str();
+}
+
+std::vector<std::pair<int, BranchLabelIndex>>
+doParam(std::string type, std::string val, std::vector<std::pair<int, BranchLabelIndex>> tList,
+        std::vector<std::pair<int, BranchLabelIndex>> fList, bool isLast) {
+    CodeBuffer::instance().doParam(type, val, tList, fList, isLast);
+}
+
+void doFuncCall(int size, std::string name) {
+    std::string rType = symTableStack[0].getRetTypeById(name);
+    CodeBuffer::instance().doFuncCall(size, name, rType);
+
+}
+
+std::string getExpVal(Node *exp) {
+    return exp->reg.empty() ? std::to_string(exp->val) : exp->reg;
+}
+
+void dprint(std::string str) {
+    std::cout << str << std::endl;
+
+}
+
 
 
 

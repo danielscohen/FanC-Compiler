@@ -49,6 +49,14 @@ void initVar(const string &name, int val);
 void initVarStack();
 std::vector<std::pair<int, BranchLabelIndex>> doList();
 int doRelop(std::string regL, std::string regR, std::string op);
+std::string getpTypesStr(std::vector<std::string> pTypes);
+std::vector<std::pair<int, BranchLabelIndex>>
+doParam(std::string type, std::string val, std::vector<std::pair<int, BranchLabelIndex>> tList,
+        std::vector<std::pair<int, BranchLabelIndex>> fList, bool isLast);
+void doFuncCall(int size, std::string name);
+std::string getExpVal(YYSTYPE exp);
+void dprint(std::string str);
+
 
 
 

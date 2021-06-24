@@ -17,6 +17,7 @@ class CodeBuffer{
 	std::vector<std::string> buffer;
 	std::vector<std::string> globalDefs;
 public:
+    int pRegIndex = 1;
 	static CodeBuffer &instance();
 
 	// ******** Methods to handle the code section ******** //
@@ -63,11 +64,16 @@ public:
     void setVar(int offset, int val = 0);
     std::string getVar(int offset);
     std::string genReg();
+    std::string genPReg();
     std::string doBinop(std::string lVal, std::string rVal, std::string lType, std::string rType, std::string op);
     void addBegCodetoBuffer();
 
     std::vector<std::pair<int, BranchLabelIndex>> doList();
     int doRelop(std::string regL, std::string regR, std::string op);
+    std::vector<std::pair<int, BranchLabelIndex>>
+    doParam(std::string type, std::string val, std::vector<std::pair<int, BranchLabelIndex>> tList,
+            std::vector<std::pair<int, BranchLabelIndex>> fList, bool isLast);
+    void doFuncCall(int size, std::string name, std::string rType);
 
 };
 

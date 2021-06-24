@@ -208,6 +208,51 @@ int CodeBuffer::doRelop(std::string regL, std::string regR, std::string op) {
     return emit("br i1 %tmp, label @, label @");
 }
 
+std::vector<std::pair<int, BranchLabelIndex>>
+CodeBuffer::doParam(std::string type, std::string val, std::vector<std::pair<int, BranchLabelIndex>> tList,
+                    std::vector<std::pair<int, BranchLabelIndex>> fList, bool isLast) {
+    if(type == "BOOL"){
+        int addr1 = 0, addr2 = 0;
+        bpatch(tList, genLabel());
+        std::string temp(genPReg());
+        emit(temp + " = add i32 0, 1");
+        if(!isLast) addr1 = emit("br label @");
+        bpatch(fList, genLabel());
+        temp = genPReg();
+        emit(temp + " = add i32 0, 0");
+        if(!isLast) addr2 = emit("br label @");
+        return merge(makelist(std::pair<int, BranchLabelIndex>(addr1, FIRST)),
+                     makelist(std::pair<int, BranchLabelIndex>(addr2, FIRST)));
+    }
+    std::string temp(genPReg());
+    emit(temp + " = add i32 0, " + val);
+    int addr = 0;
+    if(!isLast) {
+        addr = emit("br label @");
+    }
+    return makelist(std::pair<int, BranchLabelIndex>(addr, FIRST));
+}
+
+std::string CodeBuffer::genPReg() {
+    std::stringstream reg;
+    reg << "%preg";
+    reg << pRegIndex++;
+    std::string ret(reg.str());
+    return ret;
+}
+
+void CodeBuffer::doFuncCall(int size, std::string name, std::string rType) {
+    std::stringstream str;
+    str << std::string("call ") + (rType == "VOID" ? "void " : "i32 ") + "@" + name + "(";
+    for(int i = 0; i < size; i++){
+        str << "i32 %preg";
+        str << (i + 1);
+        if(i != size - 1) str << ", ";
+    }
+    str << ")";
+    emit(str.str());
+}
+
 // ******** Helper Methods ********** //
 bool replace(string& str, const string& from, const string& to, const BranchLabelIndex index) {
 	size_t pos;
