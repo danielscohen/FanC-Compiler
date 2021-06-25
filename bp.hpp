@@ -17,7 +17,8 @@ class CodeBuffer{
 	std::vector<std::string> buffer;
 	std::vector<std::string> globalDefs;
 public:
-    int pRegIndex = 1;
+    int pRegIndex1 = 1;
+    int pRegIndex2 = 1;
 	static CodeBuffer &instance();
 
 	// ******** Methods to handle the code section ******** //
@@ -61,7 +62,7 @@ public:
 
     void initVarStack();
     std::string getVarAddr(int offset);
-    void setVar(int offset, int val = 0);
+    void setVar(int offset, string val);
     std::string getVar(int offset);
     std::string genReg();
     std::string genPReg();

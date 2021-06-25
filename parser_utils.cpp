@@ -242,7 +242,7 @@ void checkByte(int val) {
     }
 }
 
-void initVar(const string &name, int val) {
+void initVar(const string &name, string val) {
     int offset;
     for(SymbolTable& table : symTableStack){
         if(table.existsInTable(name)){
@@ -268,7 +268,7 @@ std::string getpTypesStr(std::vector<std::string> pTypes) {
     std::stringstream str;
     str << "(";
     for(int i =0; i < (int)pTypes.size(); i++){
-        str << pTypes[i];
+        str << "i32";
         if(i != pTypes.size() - 1){
             str << ", ";
         }

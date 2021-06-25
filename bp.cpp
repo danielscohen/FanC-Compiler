@@ -94,7 +94,7 @@ std::string CodeBuffer::getVarAddr(int offset) {
     return ret;
 }
 
-void CodeBuffer::setVar(int offset, int val) {
+void CodeBuffer::setVar(int offset, string val) {
     std::stringstream str;
     str << "store i32 ";
     str << val;
@@ -235,8 +235,10 @@ CodeBuffer::doParam(std::string type, std::string val, std::vector<std::pair<int
 
 std::string CodeBuffer::genPReg() {
     std::stringstream reg;
-    reg << "%preg";
-    reg << pRegIndex++;
+    reg << "%preg_";
+    reg << pRegIndex1;
+    reg << "_";
+    reg << pRegIndex2++;
     std::string ret(reg.str());
     return ret;
 }
@@ -245,12 +247,16 @@ void CodeBuffer::doFuncCall(int size, std::string name, std::string rType) {
     std::stringstream str;
     str << std::string("call ") + (rType == "VOID" ? "void " : "i32 ") + "@" + name + "(";
     for(int i = 0; i < size; i++){
-        str << "i32 %preg";
+        str << "i32 %preg_";
+        str << pRegIndex1;
+        str << "_";
         str << (i + 1);
         if(i != size - 1) str << ", ";
     }
     str << ")";
     emit(str.str());
+    pRegIndex1++;
+    pRegIndex2 = 1;
 }
 
 // ******** Helper Methods ********** //

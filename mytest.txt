@@ -1,3 +1,23 @@
-void main(){
-    if(3<4) printi(1); 
+void printByValue(bool val) {
+	if (val)
+		printi(1);
+	else {
+		printi(0);
+	}
+}
+
+void main() {
+	printByValue(true);
+	printByValue(false);
+
+	if(true)
+    {
+        printi(1);
+    }
+
+    if(false or false and  true)
+    {
+        printi(0);
+    }
+    
 }
