@@ -290,7 +290,10 @@ void doFuncCall(int size, std::string name) {
 }
 
 std::string getExpVal(Node *exp) {
-    return exp->reg.empty() ? std::to_string(exp->val) : exp->reg;
+    std::string ret;
+    if(exp->type == "STRING") ret = exp->name;
+    else ret = exp->reg.empty() ? std::to_string(exp->val) : exp->reg;
+    return ret;
 }
 
 void dprint(std::string str) {

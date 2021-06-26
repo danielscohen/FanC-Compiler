@@ -18,8 +18,8 @@ label_16:
 %lVars = alloca [50 x i32]
 br label %label_19
 label_19:
-%tmp = icmp eq i32 %0, 1
-br i1 %tmp, label %label_22, label %label_27
+%reg0 = icmp eq i32 %0, 1
+br i1 %reg0, label %label_22, label %label_27
 label_22:
 %preg_1_1 = add i32 0, 1
 call void @printi(i32 %preg_1_1)
@@ -40,37 +40,41 @@ br label %label_39
 label_39:
 br label %label_41
 label_41:
-%preg_3_1 = add i32 0, 1
+br label %label_45
 label_43:
-%preg_3_2 = add i32 0, 0
+br label %label_45
+label_45:
+%preg_3_1 = phi i32 [1, %label_41], [0, %label_43]
 call void @printByValue(i32 %preg_3_1)
-br label %label_47
-label_47:
-br label %label_51
+br label %label_49
 label_49:
-%preg_4_1 = add i32 0, 1
+br label %label_53
 label_51:
-%preg_4_2 = add i32 0, 0
-call void @printByValue(i32 %preg_4_1)
+br label %label_55
+label_53:
 br label %label_55
 label_55:
-br label %label_57
-label_57:
+%preg_4_1 = phi i32 [1, %label_51], [0, %label_53]
+call void @printByValue(i32 %preg_4_1)
+br label %label_59
+label_59:
+br label %label_61
+label_61:
 %preg_5_1 = add i32 0, 1
 call void @printi(i32 %preg_5_1)
-br label %label_62
-br label %label_62
-label_62:
-br label %
-label_64:
-br label %label_73
+br label %label_66
+br label %label_66
 label_66:
 br label %label_68
 label_68:
+br label %label_77
+label_70:
+br label %label_72
+label_72:
 %preg_6_1 = add i32 0, 0
 call void @printi(i32 %preg_6_1)
-br label %label_73
-br label %label_73
-label_73:
+br label %label_77
+br label %label_77
+label_77:
 ret void
 }

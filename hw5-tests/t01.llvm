@@ -1,3 +1,7 @@
+@reg1 = constant [13 x i8] c"val is true"
+@reg2 = constant [14 x i8] c"val is false"
+@reg3 = constant [6 x i8] c"true"
+@reg4 = constant [6 x i8] c"true"
 declare i32 @printf(i8*, ...)
 declare void @exit(i32)
 @.int_specifier = constant [4 x i8] c"%d\0A\00"
@@ -18,57 +22,63 @@ label_16:
 %lVars = alloca [50 x i32]
 br label %label_19
 label_19:
-label_20:
-%preg_1_1 = add i32 0, 0
-call void @print(i32 %preg_1_1)
-br label %label_30
-br label %label_30
-label_25:
-%preg_2_1 = add i32 0, 0
-call void @print(i32 %preg_2_1)
-br label %label_30
-br label %label_30
-label_30:
+%reg0 = icmp eq i32 %0, 1
+br i1 %reg0, label %label_22, label %label_27
+label_22:
+%preg_1_1 = getelementptr [13 x i8], [13 x i8]* @reg1, i32 0, i32 0
+call void @print(i8* %preg_1_1)
+br label %label_32
+br label %label_32
+label_27:
+%preg_2_1 = getelementptr [14 x i8], [14 x i8]* @reg2, i32 0, i32 0
+call void @print(i8* %preg_2_1)
+br label %label_32
+br label %label_32
+label_32:
 ret void
 }
 define void @main(){
-label_34:
+label_36:
 %lVars = alloca [50 x i32]
-br label %label_37
-label_37:
 br label %label_39
 label_39:
-%preg_3_1 = add i32 0, 1
+br label %label_41
 label_41:
-%preg_3_2 = add i32 0, 0
-call void @printByValue(i32 %preg_3_1)
+br label %label_45
+label_43:
 br label %label_45
 label_45:
+%preg_3_1 = phi i32 [1, %label_41], [0, %label_43]
+call void @printByValue(i32 %preg_3_1)
 br label %label_49
-label_47:
-%preg_4_1 = add i32 0, 1
 label_49:
-%preg_4_2 = add i32 0, 0
-call void @printByValue(i32 %preg_4_1)
 br label %label_53
+label_51:
+br label %label_55
 label_53:
 br label %label_55
 label_55:
-%preg_5_1 = add i32 0, 0
-call void @print(i32 %preg_5_1)
-br label %label_60
-br label %label_60
-label_60:
-br label %
-label_62:
-br label %label_71
-label_64:
+%preg_4_1 = phi i32 [1, %label_51], [0, %label_53]
+call void @printByValue(i32 %preg_4_1)
+br label %label_59
+label_59:
+br label %label_61
+label_61:
+%preg_5_1 = getelementptr [6 x i8], [6 x i8]* @reg3, i32 0, i32 0
+call void @print(i8* %preg_5_1)
+br label %label_66
 br label %label_66
 label_66:
-%preg_6_1 = add i32 0, 0
-call void @print(i32 %preg_6_1)
-br label %label_71
-br label %label_71
-label_71:
+br label %label_68
+label_68:
+br label %label_77
+label_70:
+br label %label_72
+label_72:
+%preg_6_1 = getelementptr [6 x i8], [6 x i8]* @reg4, i32 0, i32 0
+call void @print(i8* %preg_6_1)
+br label %label_77
+br label %label_77
+label_77:
 ret void
 }

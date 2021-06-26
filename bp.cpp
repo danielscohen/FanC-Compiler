@@ -128,18 +128,14 @@ CodeBuffer::doBinop(std::string lVal, std::string rVal, std::string lType, std::
         str << " = icmp eq i32 0, ";
         str << rVal;
         emit(str.str());
-        str.str("");
-        str << "br i1 ";
-        str << temp;
-        str << ", label %Div0, label %NotDiv0";
-        emit(str.str());
-        str.str("");
-        emit("Div0:");
-        emit("%temp = getelementptr [22 x i8], [22 x i8]* @divZeroText, i32 0, i32 0");
-        emit("call void @print(i8* %temp)");
+        int addr = emit("br i1 " + temp + ", label @, label @");
+        bpatch(makelist(std::pair<int, BranchLabelIndex>(addr, FIRST)), genLabel());
+        std::string ptr(genReg());
+        emit("%" + ptr + " = getelementptr [22 x i8], [22 x i8]* @divZeroText, i32 0, i32 0");
+        emit("call void @print(i8* %" + ptr + ")");
         emit("call void @exit(i32 0)");
         emit("br label %NotDiv0");
-        emit("NotDiv0:");
+        bpatch(makelist(std::pair<int, BranchLabelIndex>(addr, SECOND)), genLabel());
     }
     std::stringstream str;
     str << genReg();
@@ -198,31 +194,49 @@ std::vector<std::pair<int, BranchLabelIndex>> CodeBuffer::doList() {
 
 int CodeBuffer::doRelop(std::string regL, std::string regR, std::string op) {
     std::stringstream str;
-    str << "%tmp = icmp ";
+    std::string temp(genReg());
+    str << temp + " = icmp ";
     str << op;
     str << " i32 ";
     str << regL;
     str << ", ";
     str << regR;
     emit(str.str());
-    return emit("br i1 %tmp, label @, label @");
+    return emit("br i1 "+ temp + ", label @, label @");
 }
 
 std::vector<std::pair<int, BranchLabelIndex>>
 CodeBuffer::doParam(std::string type, std::string val, std::vector<std::pair<int, BranchLabelIndex>> tList,
                     std::vector<std::pair<int, BranchLabelIndex>> fList, bool isLast) {
+    if(type == "STRING"){
+        std::string txtSize(std::to_string(val.size()));
+        std::string str(genReg().erase(0, 1));
+        emitGlobal("@" + str + " = constant [" + txtSize + " x i8] c" + val);
+        std::string ptr(genPReg());
+        emit(ptr + " = getelementptr [" + txtSize + " x i8], [" + txtSize + " x i8]* @" + str + ", i32 0, i32 0");
+        int addr = 0;
+        if(!isLast) {
+            addr = emit("br label @");
+        }
+        return makelist(std::pair<int, BranchLabelIndex>(addr, FIRST));
+
+    }
     if(type == "BOOL"){
-        int addr1 = 0, addr2 = 0;
-        bpatch(tList, genLabel());
+        std::string tLabel(genLabel());
+        bpatch(tList, tLabel);
+        int tAddr = emit("br label @");
+        std::string fLabel(genLabel());
+        bpatch(fList, fLabel);
+        int fAddr = emit("br label @");
+        bpatch(merge(makelist(std::pair<int, BranchLabelIndex>(tAddr, FIRST)),
+                     makelist(std::pair<int, BranchLabelIndex>(fAddr, FIRST))), genLabel());
         std::string temp(genPReg());
-        emit(temp + " = add i32 0, 1");
-        if(!isLast) addr1 = emit("br label @");
-        bpatch(fList, genLabel());
-        temp = genPReg();
-        emit(temp + " = add i32 0, 0");
-        if(!isLast) addr2 = emit("br label @");
-        return merge(makelist(std::pair<int, BranchLabelIndex>(addr1, FIRST)),
-                     makelist(std::pair<int, BranchLabelIndex>(addr2, FIRST)));
+        emit(temp + " = phi i32 [1, %" + tLabel + "], [0, %" + fLabel + "]" );
+        int addr = 0;
+        if(!isLast){
+            addr = emit("br label @");
+        }
+        return makelist(std::pair<int, BranchLabelIndex>(addr, FIRST));
     }
     std::string temp(genPReg());
     emit(temp + " = add i32 0, " + val);
@@ -244,18 +258,24 @@ std::string CodeBuffer::genPReg() {
 }
 
 void CodeBuffer::doFuncCall(int size, std::string name, std::string rType) {
+    int index1 = pRegIndex1;
+    pRegIndex1++;
+    if(name == "print"){
+        emit("call void @print(i8* %preg_" + std::to_string(index1) + "_1)");
+        pRegIndex2 = 1;
+        return;
+    }
     std::stringstream str;
     str << std::string("call ") + (rType == "VOID" ? "void " : "i32 ") + "@" + name + "(";
     for(int i = 0; i < size; i++){
         str << "i32 %preg_";
-        str << pRegIndex1;
+        str << index1;
         str << "_";
         str << (i + 1);
         if(i != size - 1) str << ", ";
     }
     str << ")";
     emit(str.str());
-    pRegIndex1++;
     pRegIndex2 = 1;
 }
 
