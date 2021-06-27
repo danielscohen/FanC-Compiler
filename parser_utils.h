@@ -8,12 +8,14 @@
 #include "yystype.h"
 #include "symbol_table.h"
 #include <vector>
+#include <stack>
 #include "parser.tab.hpp"
 #include "bp.hpp"
 
 
 extern std::vector<SymbolTable> symTableStack;
 extern std::vector<int> offsetStack;
+extern std::stack<std::pair<int, int>> funcParamLabelStack;
 extern int yylineno;
 
 bool symPrevDefined(std::string);
@@ -56,6 +58,8 @@ doParam(std::string type, std::string val, std::vector<std::pair<int, BranchLabe
 void doFuncCall(int size, std::string name);
 std::string getExpVal(YYSTYPE exp);
 void dprint(std::string str);
+void enterCallLabelScope();
+void exitCallLabelScope();
 
 
 

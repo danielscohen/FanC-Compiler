@@ -93,7 +93,7 @@ Statment : LBRACE {enterScope("");} Statements RBRACE 		{exitScope(); $$ = $3;}
 ;
 
 
-Call : ID LPAREN ExpList RPAREN 											{$$ = funCall($1->name, $3->pTypes); doFuncCall($3->pTypes.size(), $1->name);}
+Call : ID LPAREN {enterCallLabelScope()} ExpList RPAREN 											{$$ = funCall($1->name, $4->pTypes); doFuncCall($4->pTypes.size(), $1->name); exitCallLabelScope();}
 	 | ID LPAREN RPAREN 													{$$ = funCall($1->name, std::vector<std::string>());}
 ;
 

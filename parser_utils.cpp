@@ -10,6 +10,7 @@
 
 std::vector<SymbolTable> symTableStack;
 std::vector<int> offsetStack;
+std::stack<std::pair<int, int>> funcParamLabelStack;
 
 void enterScope(std::string scopeType) {
     symTableStack.push_back(SymbolTable(scopeType));
@@ -299,6 +300,15 @@ std::string getExpVal(Node *exp) {
 void dprint(std::string str) {
     std::cout << str << std::endl;
 
+}
+
+void enterCallLabelScope() {
+    static int counter = 1;
+    funcParamLabelStack.push(std::pair<int,int>(counter++, 1));
+}
+
+void exitCallLabelScope() {
+    funcParamLabelStack.pop();
 }
 
 

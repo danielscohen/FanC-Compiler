@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 using namespace std;
+extern std::stack<std::pair<int, int>> funcParamLabelStack;
 
 bool replace(string& str, const string& from, const string& to, const BranchLabelIndex index);
 
@@ -250,19 +251,17 @@ CodeBuffer::doParam(std::string type, std::string val, std::vector<std::pair<int
 std::string CodeBuffer::genPReg() {
     std::stringstream reg;
     reg << "%preg_";
-    reg << pRegIndex1;
+    reg << funcParamLabelStack.top().first;
     reg << "_";
-    reg << pRegIndex2++;
+    reg << funcParamLabelStack.top().second++;
     std::string ret(reg.str());
     return ret;
 }
 
 void CodeBuffer::doFuncCall(int size, std::string name, std::string rType) {
-    int index1 = pRegIndex1;
-    pRegIndex1++;
+    int index1 = funcParamLabelStack.top().first;
     if(name == "print"){
         emit("call void @print(i8* %preg_" + std::to_string(index1) + "_1)");
-        pRegIndex2 = 1;
         return;
     }
     std::stringstream str;
@@ -276,7 +275,6 @@ void CodeBuffer::doFuncCall(int size, std::string name, std::string rType) {
     }
     str << ")";
     emit(str.str());
-    pRegIndex2 = 1;
 }
 
 // ******** Helper Methods ********** //

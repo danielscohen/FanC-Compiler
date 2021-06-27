@@ -2,6 +2,7 @@
 #define EX5_CODE_GEN
 
 #include <vector>
+#include <stack>
 #include <string>
 
 using namespace std;
