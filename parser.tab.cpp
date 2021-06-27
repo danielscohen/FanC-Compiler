@@ -1572,7 +1572,7 @@ yyreduce:
 
   case 36:
 #line 100 "parser.ypp" /* yacc.c:1646  */
-    {  (yyval) = new Exp(""); (yyval)->pTypes.push_back(std::string((yyvsp[0])->type));doParam((yyvsp[0])->type, getExpVal((yyvsp[0])->trueList, (yyvsp[0])->falseList, (yyvsp[0])->name, std::to_string((yyvsp[0])->val), (yyvsp[0])->type, (yyvsp[0])->reg), (yyvsp[0])->trueList, (yyvsp[0])->falseList, true);}
+    {  (yyval) = new Exp(""); std::string str(getType((yyvsp[0])->type));  doParam((yyvsp[0])->type, getExpVal((yyvsp[0])->trueList, (yyvsp[0])->falseList, (yyvsp[0])->name, std::to_string((yyvsp[0])->val), (yyvsp[0])->type, (yyvsp[0])->reg), (yyvsp[0])->trueList, (yyvsp[0])->falseList, true);dprint(str);}
 #line 1577 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
@@ -1645,7 +1645,7 @@ yyreduce:
 
   case 48:
 #line 119 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = (yyvsp[0]);}
+    {(yyval) = new Exp((yyvsp[0])->type); (yyval)->reg = (yyvsp[0])->reg;}
 #line 1650 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 

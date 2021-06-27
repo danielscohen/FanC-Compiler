@@ -245,6 +245,7 @@ CodeBuffer::doParam(std::string type, std::string val, std::vector<std::pair<int
     if(!isLast) {
         addr = emit("br label @");
     }
+    cout << type << endl;
     return makelist(std::pair<int, BranchLabelIndex>(addr, FIRST));
 }
 

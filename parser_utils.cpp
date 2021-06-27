@@ -310,7 +310,7 @@ getExpVal(std::vector<std::pair<int, BranchLabelIndex>> tList, std::vector<std::
     std::string ret;
     if(type == "STRING") ret = name;
     else ret = reg.empty() ? val : reg;
-//    std::cout << exp->pTypes[0] << std::endl;
+    std::cout << val << std::endl;
     return ret;
 }
 
@@ -348,6 +348,19 @@ void enterCallLabelScope() {
 
 void exitCallLabelScope() {
     funcParamLabelStack.pop();
+}
+
+std::string getType(std::string str) {
+    if(str == "INT"){
+        return "INT";
+    }
+    if(str == "BYTE"){
+        return "BYTE";
+    }
+    if(str == "BOOL"){
+        return "BOOL";
+    }
+    return "STRING";
 }
 
 

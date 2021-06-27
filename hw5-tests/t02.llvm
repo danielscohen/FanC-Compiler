@@ -1,0 +1,4 @@
+0
+BYTE
+BYTE
+line 3: prototype mismatch, function fib expects arguments (BYTE)

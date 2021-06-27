@@ -62,6 +62,7 @@ std::string getExpVal(YYSTYPE exp);
 void dprint(std::string str);
 void enterCallLabelScope();
 void exitCallLabelScope();
+std::string getType(std::string str);
 
 
 
