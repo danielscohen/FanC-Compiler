@@ -290,13 +290,52 @@ void doFuncCall(int size, std::string name) {
 
 }
 
-std::string getExpVal(Node *exp) {
+std::string
+getExpVal(std::vector<std::pair<int, BranchLabelIndex>> tList, std::vector<std::pair<int, BranchLabelIndex>> fList,
+          std::string name, std::string val, std::string type, std::string reg) {
+    CodeBuffer& buff = CodeBuffer::instance();
+    if(type == "BOOL") {
+        std::string tLabel(buff.genLabel());
+        buff.bpatch(tList, tLabel);
+        int tAddr = buff.emit("br label @");
+        std::string fLabel(buff.genLabel());
+        buff.bpatch(tList, fLabel);
+        int fAddr = buff.emit("br label @");
+        buff.bpatch(buff.merge(buff.makelist(std::pair<int, BranchLabelIndex>(tAddr, FIRST)),
+                     buff.makelist(std::pair<int, BranchLabelIndex>(fAddr, FIRST))), buff.genLabel());
+        std::string temp(buff.genReg());
+        buff.emit(temp + " = phi i32 [1, %" + tLabel + "], [0, %" + fLabel + "]");
+        return temp;
+    }
     std::string ret;
-    if(exp->type == "STRING") ret = exp->name;
-    else ret = exp->reg.empty() ? std::to_string(exp->val) : exp->reg;
+    if(type == "STRING") ret = name;
+    else ret = reg.empty() ? val : reg;
+//    std::cout << exp->pTypes[0] << std::endl;
     return ret;
 }
 
+std::string getExpVal(YYSTYPE exp
+        ) {
+CodeBuffer& buff = CodeBuffer::instance();
+if(exp->type == "BOOL") {
+std::string tLabel(buff.genLabel());
+buff.bpatch(exp->trueList, tLabel);
+int tAddr = buff.emit("br label @");
+std::string fLabel(buff.genLabel());
+buff.bpatch(exp->falseList, fLabel);
+int fAddr = buff.emit("br label @");
+buff.bpatch(buff.merge(buff.makelist(std::pair<int, BranchLabelIndex>(tAddr, FIRST)),
+buff.makelist(std::pair<int, BranchLabelIndex>(fAddr, FIRST))), buff.genLabel());
+std::string temp(buff.genReg());
+buff.emit(temp + " = phi i32 [1, %" + tLabel + "], [0, %" + fLabel + "]");
+return temp;
+}
+std::string ret;
+if(exp->type == "STRING") ret = exp->name;
+else ret = exp->reg.empty() ? std::to_string(exp->val) : exp->reg;
+//    std::cout << exp->pTypes[0] << std::endl;
+return ret;
+}
 void dprint(std::string str) {
     std::cout << str << std::endl;
 

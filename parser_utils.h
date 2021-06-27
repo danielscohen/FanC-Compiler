@@ -56,6 +56,8 @@ std::vector<std::pair<int, BranchLabelIndex>>
 doParam(std::string type, std::string val, std::vector<std::pair<int, BranchLabelIndex>> tList,
         std::vector<std::pair<int, BranchLabelIndex>> fList, bool isLast);
 void doFuncCall(int size, std::string name);
+std::string getExpVal(std::vector<std::pair<int, BranchLabelIndex>> tList, std::vector<std::pair<int, BranchLabelIndex>> fList,
+        std::string name, std::string val, std::string type, std::string reg);
 std::string getExpVal(YYSTYPE exp);
 void dprint(std::string str);
 void enterCallLabelScope();

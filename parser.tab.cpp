@@ -1572,13 +1572,13 @@ yyreduce:
 
   case 36:
 #line 100 "parser.ypp" /* yacc.c:1646  */
-    {(yyvsp[0])->pTypes.push_back((yyvsp[0])->type); (yyval) = (yyvsp[0]); doParam((yyvsp[0])->type, getExpVal((yyvsp[0])), (yyvsp[0])->trueList, (yyvsp[0])->falseList, true); }
+    {  (yyval) = new Exp(""); (yyval)->pTypes.push_back(std::string((yyvsp[0])->type));doParam((yyvsp[0])->type, getExpVal((yyvsp[0])->trueList, (yyvsp[0])->falseList, (yyvsp[0])->name, std::to_string((yyvsp[0])->val), (yyvsp[0])->type, (yyvsp[0])->reg), (yyvsp[0])->trueList, (yyvsp[0])->falseList, true);}
 #line 1577 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 37:
 #line 101 "parser.ypp" /* yacc.c:1646  */
-    {BUFF.bpatch(doParam((yyvsp[-1])->type, getExpVal((yyvsp[-1])), (yyvsp[-1])->trueList, (yyvsp[-1])->falseList, false), BUFF.genLabel());}
+    {BUFF.bpatch(doParam((yyvsp[-1])->type, getExpVal((yyvsp[-1])->trueList, (yyvsp[-1])->falseList, (yyvsp[-1])->name, std::to_string((yyvsp[-1])->val), (yyvsp[-1])->type, (yyvsp[-1])->reg), (yyvsp[-1])->trueList, (yyvsp[-1])->falseList, false), BUFF.genLabel());}
 #line 1583 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
@@ -1638,7 +1638,7 @@ yyreduce:
 
   case 47:
 #line 117 "parser.ypp" /* yacc.c:1646  */
-    {(yyval) = getById((yyvsp[0])); int addr; if((yyval)->type == "BOOL") addr = doRelop(getExpVal((yyval)), "1", "eq"); 
+    {(yyval) = getById((yyvsp[0])); int addr; if((yyval)->type == "BOOL") addr = doRelop((yyval)->reg, "1", "eq"); 
 																			(yyval)->trueList = BUFF.makelist(addrPair(addr, FIRST)); (yyval)->falseList = BUFF.makelist(addrPair(addr, SECOND));}
 #line 1644 "parser.tab.cpp" /* yacc.c:1646  */
     break;
@@ -1681,7 +1681,7 @@ yyreduce:
 
   case 54:
 #line 125 "parser.ypp" /* yacc.c:1646  */
-    {checkNot((yyvsp[0])); (yyval) = (yyvsp[0]); (yyval)->trueList = (yyvsp[0])->falseList; (yyval)->falseList = (yyvsp[0])->trueList;}
+    {checkNot((yyvsp[0])); (yyval) = new Exp("BOOL"); (yyval)->trueList = (yyvsp[0])->falseList; (yyval)->falseList = (yyvsp[0])->trueList;}
 #line 1686 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 

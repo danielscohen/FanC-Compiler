@@ -1,8 +1,10 @@
+@reg5 = constant [10 x i8] c"a is true\00"
+@reg6 = constant [11 x i8] c"a is false\00"
 declare i32 @printf(i8*, ...)
 declare void @exit(i32)
 @.int_specifier = constant [4 x i8] c"%d\0A\00"
 @.str_specifier = constant [4 x i8] c"%s\0A\00"
-@divZeroText = constant [22 x i8] c"Error division by zero"
+@divZeroText = constant [23 x i8] c"Error division by zero\00"
 define void @printi(i32) {
 %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
 call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
@@ -13,68 +15,40 @@ define void @print(i8*) {
 call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
 ret void
 }
-define void @printByValue(i32){
+define void @main(){
 label_16:
 %lVars = alloca [50 x i32]
 br label %label_19
 label_19:
-%reg0 = icmp eq i32 %0, 1
-br i1 %reg0, label %label_22, label %label_27
-label_22:
-%preg_1_1 = add i32 0, 1
-call void @printi(i32 %preg_1_1)
-br label %label_32
-br label %label_32
+br label %label_21
+label_21:
+br label %label_25
+label_23:
+br label %label_27
+label_25:
+br label %label_27
 label_27:
-%preg_2_1 = add i32 0, 0
-call void @printi(i32 %preg_2_1)
-br label %label_32
+%reg0 = phi i32 [1, %label_23], [0, %label_25]
+%reg1 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
+store i32 %reg0, i32* %reg1
 br label %label_32
 label_32:
-ret void
-}
-define void @main(){
-label_36:
-%lVars = alloca [50 x i32]
+%reg3 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
+%reg2 = load i32, i32* %reg3
+%reg4 = icmp eq i32 %reg2, 1
+br i1 %reg4, label %label_39, label %label_37
+label_37:
 br label %label_39
 label_39:
-br label %label_41
-label_41:
-br label %label_45
-label_43:
-br label %label_45
-label_45:
-%preg_3_1 = phi i32 [1, %label_41], [0, %label_43]
-call void @printByValue(i32 %preg_3_1)
+%preg_1_1 = getelementptr [10 x i8], [10 x i8]* @reg5, i32 0, i32 0
+call void @print(i8* %preg_1_1)
+br label %label_49
+br label %label_49
+label_44:
+%preg_2_1 = getelementptr [11 x i8], [11 x i8]* @reg6, i32 0, i32 0
+call void @print(i8* %preg_2_1)
+br label %label_49
 br label %label_49
 label_49:
-br label %label_53
-label_51:
-br label %label_55
-label_53:
-br label %label_55
-label_55:
-%preg_4_1 = phi i32 [1, %label_51], [0, %label_53]
-call void @printByValue(i32 %preg_4_1)
-br label %label_59
-label_59:
-br label %label_61
-label_61:
-%preg_5_1 = add i32 0, 1
-call void @printi(i32 %preg_5_1)
-br label %label_66
-br label %label_66
-label_66:
-br label %label_68
-label_68:
-br label %label_77
-label_70:
-br label %label_72
-label_72:
-%preg_6_1 = add i32 0, 0
-call void @printi(i32 %preg_6_1)
-br label %label_77
-br label %label_77
-label_77:
 ret void
 }

@@ -132,7 +132,7 @@ CodeBuffer::doBinop(std::string lVal, std::string rVal, std::string lType, std::
         int addr = emit("br i1 " + temp + ", label @, label @");
         bpatch(makelist(std::pair<int, BranchLabelIndex>(addr, FIRST)), genLabel());
         std::string ptr(genReg());
-        emit("%" + ptr + " = getelementptr [22 x i8], [22 x i8]* @divZeroText, i32 0, i32 0");
+        emit("%" + ptr + " = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0");
         emit("call void @print(i8* %" + ptr + ")");
         emit("call void @exit(i32 0)");
         emit("br label %NotDiv0");
@@ -173,7 +173,7 @@ void CodeBuffer::addBegCodetoBuffer() {
     emit("declare void @exit(i32)");
     emit("@.int_specifier = constant [4 x i8] c\"%d\\0A\\00\"");
     emit("@.str_specifier = constant [4 x i8] c\"%s\\0A\\00\"");
-    emit("@divZeroText = constant [22 x i8] c\"Error division by zero\"");
+    emit("@divZeroText = constant [23 x i8] c\"Error division by zero\\00\"");
     emit("define void @printi(i32) {");
     emit("%spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0");
     emit("call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)");
@@ -210,9 +210,9 @@ std::vector<std::pair<int, BranchLabelIndex>>
 CodeBuffer::doParam(std::string type, std::string val, std::vector<std::pair<int, BranchLabelIndex>> tList,
                     std::vector<std::pair<int, BranchLabelIndex>> fList, bool isLast) {
     if(type == "STRING"){
-        std::string txtSize(std::to_string(val.size()));
+        std::string txtSize(std::to_string(val.size() - 1));
         std::string str(genReg().erase(0, 1));
-        emitGlobal("@" + str + " = constant [" + txtSize + " x i8] c" + val);
+        emitGlobal("@" + str + " = constant [" + txtSize + " x i8] c" + val.insert(val.size() - 1, "\\00"));
         std::string ptr(genPReg());
         emit(ptr + " = getelementptr [" + txtSize + " x i8], [" + txtSize + " x i8]* @" + str + ", i32 0, i32 0");
         int addr = 0;
