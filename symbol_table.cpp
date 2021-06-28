@@ -61,7 +61,6 @@ void SymbolTable::funMatchesDefInTable(std::string name, std::vector<std::string
     }
     for(size_t i = 0; i < pTypes.size(); i++){
         if(fun.pTypes[i] != pTypes[i] && !(fun.pTypes[i] == "INT" && pTypes[i] == "BYTE")) {
-            std::cout << "in table: " + fun.pTypes[i] + "passed in: " + pTypes[i]  << std::endl;
             output::errorPrototypeMismatch(yylineno, name, fun.pTypes);
             exit(0);
         }

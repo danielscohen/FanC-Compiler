@@ -1,0 +1,310 @@
+declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+@divZeroText = constant [23 x i8] c"Error division by zero\00"
+define void @printi(i32) {
+%spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+ret void
+}
+define void @print(i8*) {
+%spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
+call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
+ret void
+}
+define void @main(){
+label_16:
+%lVars = alloca [50 x i32]
+br label %label_19
+label_19:
+%reg0 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
+store i32 0, i32* %reg0
+br label %label_23
+label_23:
+%reg1 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 1
+store i32 1, i32* %reg1
+br label %label_27
+label_27:
+%reg2 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 2
+store i32 2, i32* %reg2
+br label %label_31
+label_31:
+%reg3 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 3
+store i32 5, i32* %reg3
+br label %label_35
+label_35:
+%reg4 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+store i32 0, i32* %reg4
+br label %label_39
+label_39:
+%reg6 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
+%reg5 = load i32, i32* %reg6
+%reg8 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 1
+%reg7 = load i32, i32* %reg8
+%reg9 = add i32 %reg5, %reg7
+%reg11 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 3
+%reg10 = load i32, i32* %reg11
+%reg12 = sub i32 %reg9, %reg10
+%reg13 = add i32 %reg12, 2
+%reg14 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+store i32 %reg13, i32* %reg14
+br label %label_52
+label_52:
+%reg16 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+%reg15 = load i32, i32* %reg16
+%preg_1_1 = add i32 0, %reg15
+call void @printi(i32 %preg_1_1)
+br label %label_58
+label_58:
+%reg19 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 3
+%reg18 = load i32, i32* %reg19
+%reg20 = mul i32 2, %reg18
+%reg22 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 2
+%reg21 = load i32, i32* %reg22
+%reg23 = mul i32 %reg21, 3
+%reg24 = add i32 %reg20, %reg23
+%reg25 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+store i32 %reg24, i32* %reg25
+br label %label_69
+label_69:
+%reg27 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+%reg26 = load i32, i32* %reg27
+%preg_2_1 = add i32 0, %reg26
+call void @printi(i32 %preg_2_1)
+br label %label_75
+label_75:
+%reg30 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 3
+%reg29 = load i32, i32* %reg30
+%reg32 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 2
+%reg31 = load i32, i32* %reg32
+%reg33 = add i32 %reg29, %reg31
+%reg34 = mul i32 2, %reg33
+%reg35 = mul i32 %reg34, 3
+%reg36 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+store i32 %reg35, i32* %reg36
+br label %label_86
+label_86:
+%reg38 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+%reg37 = load i32, i32* %reg38
+%preg_3_1 = add i32 0, %reg37
+call void @printi(i32 %preg_3_1)
+br label %label_92
+label_92:
+%reg40 = icmp eq i32 0, 2
+br i1 %reg40, label %label_95, label %label_100
+label_95:
+%reg41 = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0
+call void @print(i8* %reg41)
+call void @exit(i32 0)
+br label %label_100
+label_100:
+%reg42 = sdiv i32 10, 2
+%reg43 = mul i32 %reg42, 10
+%reg44 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+store i32 %reg43, i32* %reg44
+br label %label_106
+label_106:
+%reg46 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+%reg45 = load i32, i32* %reg46
+%preg_4_1 = add i32 0, %reg45
+call void @printi(i32 %preg_4_1)
+br label %label_112
+label_112:
+%reg48 = mul i32 2, 10
+%reg49 = icmp eq i32 0, %reg48
+br i1 %reg49, label %label_116, label %label_121
+label_116:
+%reg50 = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0
+call void @print(i8* %reg50)
+call void @exit(i32 0)
+br label %label_121
+label_121:
+%reg51 = sdiv i32 10, %reg48
+%reg52 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+store i32 %reg51, i32* %reg52
+br label %label_126
+label_126:
+%reg54 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+%reg53 = load i32, i32* %reg54
+%preg_5_1 = add i32 0, %reg53
+call void @printi(i32 %preg_5_1)
+br label %label_132
+label_132:
+%reg57 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 3
+%reg56 = load i32, i32* %reg57
+%reg58 = mul i32 3, 2
+%reg59 = icmp eq i32 0, 2
+br i1 %reg59, label %label_138, label %label_143
+label_138:
+%reg60 = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0
+call void @print(i8* %reg60)
+call void @exit(i32 0)
+br label %label_143
+label_143:
+%reg61 = sdiv i32 %reg58, 2
+%reg62 = add i32 %reg56, %reg61
+%reg63 = icmp eq i32 0, 5
+br i1 %reg63, label %label_148, label %label_153
+label_148:
+%reg64 = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0
+call void @print(i8* %reg64)
+call void @exit(i32 0)
+br label %label_153
+label_153:
+%reg65 = sdiv i32 15, 5
+%reg66 = mul i32 %reg65, 3
+%reg67 = sub i32 %reg62, %reg66
+%reg68 = sub i32 %reg67, 2
+%reg69 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+store i32 %reg68, i32* %reg69
+br label %label_161
+label_161:
+%reg71 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+%reg70 = load i32, i32* %reg71
+%preg_6_1 = add i32 0, %reg70
+call void @printi(i32 %preg_6_1)
+br label %label_167
+label_167:
+%reg74 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 3
+%reg73 = load i32, i32* %reg74
+%reg75 = mul i32 3, 2
+%reg76 = icmp eq i32 0, 2
+br i1 %reg76, label %label_173, label %label_178
+label_173:
+%reg77 = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0
+call void @print(i8* %reg77)
+call void @exit(i32 0)
+br label %label_178
+label_178:
+%reg78 = sdiv i32 %reg75, 2
+%reg79 = add i32 %reg73, %reg78
+%reg80 = icmp eq i32 0, 5
+br i1 %reg80, label %label_183, label %label_188
+label_183:
+%reg81 = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0
+call void @print(i8* %reg81)
+call void @exit(i32 0)
+br label %label_188
+label_188:
+%reg82 = sdiv i32 15, 5
+%reg83 = mul i32 %reg82, 3
+%reg84 = sub i32 %reg79, %reg83
+%reg85 = sub i32 %reg84, 2
+%reg86 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+store i32 %reg85, i32* %reg86
+br label %label_196
+label_196:
+%reg88 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+%reg87 = load i32, i32* %reg88
+%preg_7_1 = add i32 0, %reg87
+call void @printi(i32 %preg_7_1)
+br label %label_202
+label_202:
+%reg91 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 3
+%reg90 = load i32, i32* %reg91
+%reg92 = mul i32 3, 2
+%reg93 = icmp eq i32 0, 5
+br i1 %reg93, label %label_208, label %label_213
+label_208:
+%reg94 = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0
+call void @print(i8* %reg94)
+call void @exit(i32 0)
+br label %label_213
+label_213:
+%reg95 = sdiv i32 15, 5
+%reg96 = mul i32 %reg95, 3
+%reg97 = sub i32 2, %reg96
+%reg98 = sub i32 %reg97, 2
+%reg99 = icmp eq i32 0, %reg98
+br i1 %reg99, label %label_220, label %label_225
+label_220:
+%reg100 = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0
+call void @print(i8* %reg100)
+call void @exit(i32 0)
+br label %label_225
+label_225:
+%reg101 = sdiv i32 %reg92, %reg98
+%reg102 = add i32 %reg90, %reg101
+%reg103 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+store i32 %reg102, i32* %reg103
+br label %label_231
+label_231:
+%reg105 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+%reg104 = load i32, i32* %reg105
+%preg_8_1 = add i32 0, %reg104
+call void @printi(i32 %preg_8_1)
+br label %label_237
+label_237:
+%reg108 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 3
+%reg107 = load i32, i32* %reg108
+%reg109 = mul i32 3, 2
+%reg110 = add i32 %reg107, %reg109
+%reg111 = icmp eq i32 0, 5
+br i1 %reg111, label %label_244, label %label_249
+label_244:
+%reg112 = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0
+call void @print(i8* %reg112)
+call void @exit(i32 0)
+br label %label_249
+label_249:
+%reg113 = sdiv i32 15, 5
+%reg114 = mul i32 %reg113, 3
+%reg115 = sub i32 2, %reg114
+%reg116 = sub i32 %reg115, 2
+%reg117 = icmp eq i32 0, %reg116
+br i1 %reg117, label %label_256, label %label_261
+label_256:
+%reg118 = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0
+call void @print(i8* %reg118)
+call void @exit(i32 0)
+br label %label_261
+label_261:
+%reg119 = sdiv i32 %reg110, %reg116
+%reg120 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+store i32 %reg119, i32* %reg120
+br label %label_266
+label_266:
+%reg122 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+%reg121 = load i32, i32* %reg122
+%preg_9_1 = add i32 0, %reg121
+call void @printi(i32 %preg_9_1)
+br label %label_272
+label_272:
+%reg125 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 3
+%reg124 = load i32, i32* %reg125
+%reg126 = add i32 %reg124, 3
+%reg127 = icmp eq i32 0, 2
+br i1 %reg127, label %label_278, label %label_283
+label_278:
+%reg128 = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0
+call void @print(i8* %reg128)
+call void @exit(i32 0)
+br label %label_283
+label_283:
+%reg129 = sdiv i32 2, 2
+%reg130 = mul i32 5, 3
+%reg131 = icmp eq i32 0, %reg130
+br i1 %reg131, label %label_288, label %label_293
+label_288:
+%reg132 = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0
+call void @print(i8* %reg132)
+call void @exit(i32 0)
+br label %label_293
+label_293:
+%reg133 = sdiv i32 15, %reg130
+%reg134 = sub i32 %reg129, %reg133
+%reg135 = sub i32 %reg134, 2
+%reg136 = mul i32 %reg126, %reg135
+%reg137 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+store i32 %reg136, i32* %reg137
+br label %label_301
+label_301:
+%reg139 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
+%reg138 = load i32, i32* %reg139
+%preg_10_1 = add i32 0, %reg138
+call void @printi(i32 %preg_10_1)
+br label %label_307
+label_307:
+ret void
+}

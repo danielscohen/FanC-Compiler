@@ -1,4 +1,93 @@
-0
-BYTE
-BYTE
-line 3: prototype mismatch, function fib expects arguments (BYTE)
+@reg23 = constant [2 x i8] c"*\00"
+@reg30 = constant [2 x i8] c"*\00"
+declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+@divZeroText = constant [23 x i8] c"Error division by zero\00"
+define void @printi(i32) {
+%spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+ret void
+}
+define void @print(i8*) {
+%spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
+call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
+ret void
+}
+define i32 @fib(i32){
+label_16:
+%lVars = alloca [50 x i32]
+br label %label_19
+label_19:
+%reg0 = icmp eq i32 %0, 0
+br i1 %reg0, label %label_25, label %label_22
+label_22:
+%reg1 = icmp eq i32 %0, 1
+br i1 %reg1, label %label_25, label %label_28
+label_25:
+ret i32 1
+br label %label_28
+label_28:
+%reg2 = sub i32 %0, 1
+%reg3 = trunc i32 %reg2 to i8
+%reg4 = zext i8 %reg3 to i32
+%preg_1_1 = add i32 0, %reg4
+%reg5 = call i32 @fib(i32 %preg_1_1)
+%reg6 = sub i32 %0, 2
+%reg7 = trunc i32 %reg6 to i8
+%reg8 = zext i8 %reg7 to i32
+%preg_2_1 = add i32 0, %reg8
+%reg9 = call i32 @fib(i32 %preg_2_1)
+%reg10 = add i32 %reg5, %reg9
+ret i32 %reg10
+ret i32 0
+}
+define void @main(){
+label_44:
+%lVars = alloca [50 x i32]
+br label %label_47
+label_47:
+%reg11 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
+store i32 0, i32* %reg11
+br label %label_51
+label_51:
+%reg13 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
+%reg12 = load i32, i32* %reg13
+%reg14 = icmp slt i32 %reg12, 10
+br i1 %reg14, label %label_56, label %label_84
+label_56:
+%reg16 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
+%reg15 = load i32, i32* %reg16
+%preg_4_1 = add i32 0, %reg15
+%reg17 = call i32 @fib(i32 %preg_4_1)
+%preg_3_1 = add i32 0, %reg17
+call void @printi(i32 %preg_3_1)
+br label %label_64
+label_64:
+%reg20 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
+%reg19 = load i32, i32* %reg20
+%reg21 = add i32 %reg19, 1
+%reg22 = icmp slt i32 %reg21, 10
+br i1 %reg22, label %label_70, label %label_75
+label_70:
+%preg_5_1 = getelementptr [2 x i8], [2 x i8]* @reg23, i32 0, i32 0
+call void @print(i8* %preg_5_1)
+br label %label_75
+br label %label_75
+label_75:
+%reg25 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
+%reg24 = load i32, i32* %reg25
+%reg26 = add i32 %reg24, 1
+%reg27 = trunc i32 %reg26 to i8
+%reg28 = zext i8 %reg27 to i32
+%reg29 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
+store i32 %reg28, i32* %reg29
+br label %label_51
+label_84:
+%preg_6_1 = getelementptr [2 x i8], [2 x i8]* @reg30, i32 0, i32 0
+call void @print(i8* %preg_6_1)
+br label %label_88
+label_88:
+ret void
+}

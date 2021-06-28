@@ -75,7 +75,11 @@ public:
     std::vector<std::pair<int, BranchLabelIndex>>
     doParam(std::string type, std::string val, std::vector<std::pair<int, BranchLabelIndex>> tList,
             std::vector<std::pair<int, BranchLabelIndex>> fList, bool isLast);
-    void doFuncCall(int size, std::string name, std::string rType);
+    void doParamLast(std::string type, std::string val, std::vector<std::pair<int, BranchLabelIndex>> tList,
+    std::vector<std::pair<int, BranchLabelIndex>> fList);
+    std::string
+    doFuncCall(int size, std::string name, std::string rType, std::vector<std::pair<int, BranchLabelIndex>>& tList,
+               std::vector<std::pair<int, BranchLabelIndex>>& fList);
 
 };
 

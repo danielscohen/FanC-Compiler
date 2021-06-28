@@ -132,11 +132,11 @@ CodeBuffer::doBinop(std::string lVal, std::string rVal, std::string lType, std::
         int addr = emit("br i1 " + temp + ", label @, label @");
         bpatch(makelist(std::pair<int, BranchLabelIndex>(addr, FIRST)), genLabel());
         std::string ptr(genReg());
-        emit("%" + ptr + " = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0");
-        emit("call void @print(i8* %" + ptr + ")");
+        emit(ptr + " = getelementptr [23 x i8], [23 x i8]* @divZeroText, i32 0, i32 0");
+        emit("call void @print(i8* " + ptr + ")");
         emit("call void @exit(i32 0)");
-        emit("br label %NotDiv0");
-        bpatch(makelist(std::pair<int, BranchLabelIndex>(addr, SECOND)), genLabel());
+        int addr2 = emit("br label @");
+        bpatch(merge(makelist(std::pair<int, BranchLabelIndex>(addr2, FIRST)),makelist(std::pair<int, BranchLabelIndex>(addr, SECOND))), genLabel());
     }
     std::stringstream str;
     str << genReg();
@@ -184,7 +184,6 @@ void CodeBuffer::addBegCodetoBuffer() {
     emit("call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)");
     emit("ret void");
     emit("}");
-
 }
 
 std::vector<std::pair<int, BranchLabelIndex>> CodeBuffer::doList() {
@@ -245,7 +244,7 @@ CodeBuffer::doParam(std::string type, std::string val, std::vector<std::pair<int
     if(!isLast) {
         addr = emit("br label @");
     }
-    cout << type << endl;
+//    cout << type << endl;
     return makelist(std::pair<int, BranchLabelIndex>(addr, FIRST));
 }
 
@@ -259,14 +258,23 @@ std::string CodeBuffer::genPReg() {
     return ret;
 }
 
-void CodeBuffer::doFuncCall(int size, std::string name, std::string rType) {
+std::string CodeBuffer::doFuncCall(int size, std::string name, std::string rType,
+                                   std::vector<std::pair<int, BranchLabelIndex>>& tList,
+                                   std::vector<std::pair<int, BranchLabelIndex>>& fList) {
     int index1 = funcParamLabelStack.top().first;
     if(name == "print"){
         emit("call void @print(i8* %preg_" + std::to_string(index1) + "_1)");
-        return;
+        return "";
     }
+    std::string ret(genReg());
     std::stringstream str;
-    str << std::string("call ") + (rType == "VOID" ? "void " : "i32 ") + "@" + name + "(";
+    if(rType == "VOID"){
+        str << std::string("call void @" + name + "(");
+        ret = "";
+
+    }else{
+        str << std::string(ret + " = call i32 @" + name + "(");
+    }
     for(int i = 0; i < size; i++){
         str << "i32 %preg_";
         str << index1;
@@ -276,6 +284,42 @@ void CodeBuffer::doFuncCall(int size, std::string name, std::string rType) {
     }
     str << ")";
     emit(str.str());
+    if(rType == "BOOL"){
+        std::string cond(genReg());
+        emit(cond + " = icmp eq i32 1, " + ret);
+        int addr = emit("br i1 " + cond + ", label @, label @");
+        tList = makelist(pair<int, BranchLabelIndex>(addr, FIRST));
+        fList = makelist(pair<int, BranchLabelIndex>(addr, SECOND));
+
+    }
+    return ret;
+}
+
+void CodeBuffer::doParamLast(std::string type, std::string val, std::vector<std::pair<int, BranchLabelIndex>> tList,
+                             std::vector<std::pair<int, BranchLabelIndex>> fList) {
+    if(type == "STRING"){
+        std::string txtSize(std::to_string(val.size() - 1));
+        std::string str(genReg().erase(0, 1));
+        emitGlobal("@" + str + " = constant [" + txtSize + " x i8] c" + val.insert(val.size() - 1, "\\00"));
+        std::string ptr(genPReg());
+        emit(ptr + " = getelementptr [" + txtSize + " x i8], [" + txtSize + " x i8]* @" + str + ", i32 0, i32 0");
+        return;
+    }
+    if(type == "BOOL"){
+        std::string tLabel(genLabel());
+        bpatch(tList, tLabel);
+        int tAddr = emit("br label @");
+        std::string fLabel(genLabel());
+        bpatch(fList, fLabel);
+        int fAddr = emit("br label @");
+        bpatch(merge(makelist(std::pair<int, BranchLabelIndex>(tAddr, FIRST)),
+                     makelist(std::pair<int, BranchLabelIndex>(fAddr, FIRST))), genLabel());
+        std::string temp(genPReg());
+        emit(temp + " = phi i32 [1, %" + tLabel + "], [0, %" + fLabel + "]" );
+        return;
+    }
+    std::string temp(genPReg());
+    emit(temp + " = add i32 0, " + val);
 }
 
 // ******** Helper Methods ********** //

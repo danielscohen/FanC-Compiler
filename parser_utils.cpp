@@ -243,7 +243,7 @@ void checkByte(int val) {
     }
 }
 
-void initVar(const string &name, string val) {
+void initVar(const string name, string val) {
     int offset;
     for(SymbolTable& table : symTableStack){
         if(table.existsInTable(name)){
@@ -284,9 +284,10 @@ doParam(std::string type, std::string val, std::vector<std::pair<int, BranchLabe
     CodeBuffer::instance().doParam(type, val, tList, fList, isLast);
 }
 
-void doFuncCall(int size, std::string name) {
+std::string doFuncCall(int size, std::string name, vector<pair<int, BranchLabelIndex>> &tList,
+                       vector<pair<int, BranchLabelIndex>> &fList) {
     std::string rType = symTableStack[0].getRetTypeById(name);
-    CodeBuffer::instance().doFuncCall(size, name, rType);
+    return CodeBuffer::instance().doFuncCall(size, name, rType, tList, fList);
 
 }
 
@@ -310,7 +311,7 @@ getExpVal(std::vector<std::pair<int, BranchLabelIndex>> tList, std::vector<std::
     std::string ret;
     if(type == "STRING") ret = name;
     else ret = reg.empty() ? val : reg;
-    std::cout << val << std::endl;
+//    std::cout << val << std::endl;
     return ret;
 }
 

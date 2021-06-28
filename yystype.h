@@ -20,6 +20,7 @@ struct Node {
     std::vector<std::pair<int, BranchLabelIndex>> falseList;
     std::vector<std::pair<int, BranchLabelIndex>> nextList;
     std::vector<std::pair<int, BranchLabelIndex>> breakList;
+    std::vector<std::pair<int, BranchLabelIndex>> contList;
     std::string label;
     std::string label2;
     std::vector<std::string> pNames;

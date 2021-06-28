@@ -1,6 +1,13 @@
 
+bool printb(bool val) {
+    if (val) {
+        print("true");
+        return true;
+    }
+    print("false");
+    return false;
+}
 void main() {
-    bool a = not true or false;
-    if(a or true) print("a is true"); else print("a is false");
-    
+    bool a = printb(true);
+
 }

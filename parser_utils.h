@@ -47,7 +47,7 @@ void checkBreak();
 void checkContinue();
 void checkForMain();
 void checkByte(int val);
-void initVar(const string &name, string val);
+void initVar(const string name, string val);
 void initVarStack();
 std::vector<std::pair<int, BranchLabelIndex>> doList();
 int doRelop(std::string regL, std::string regR, std::string op);
@@ -55,7 +55,8 @@ std::string getpTypesStr(std::vector<std::string> pTypes);
 std::vector<std::pair<int, BranchLabelIndex>>
 doParam(std::string type, std::string val, std::vector<std::pair<int, BranchLabelIndex>> tList,
         std::vector<std::pair<int, BranchLabelIndex>> fList, bool isLast);
-void doFuncCall(int size, std::string name);
+std::string doFuncCall(int size, std::string name, vector<pair<int, BranchLabelIndex>> &tList,
+                       vector<pair<int, BranchLabelIndex>> &fList);
 std::string getExpVal(std::vector<std::pair<int, BranchLabelIndex>> tList, std::vector<std::pair<int, BranchLabelIndex>> fList,
         std::string name, std::string val, std::string type, std::string reg);
 std::string getExpVal(YYSTYPE exp);
