@@ -134,4 +134,5 @@ call void @printi(i32 %preg_10_1)
 br label %label_134
 label_134:
 ret void
+ret void
 }

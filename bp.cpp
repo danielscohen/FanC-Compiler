@@ -46,6 +46,14 @@ void CodeBuffer::bpatch(const vector<pair<int,BranchLabelIndex>>& address_list, 
     }
 }
 
+void CodeBuffer::spatch(const vector<pair<int,BranchLabelIndex>>& address_list, const std::string &label){
+    for(vector<pair<int,BranchLabelIndex>>::const_iterator i = address_list.begin(); i != address_list.end(); i++){
+        int address = (*i).first;
+
+        buffer[address].replace(buffer[address].find_first_of("#"), 1, label);
+    }
+}
+
 void CodeBuffer::printCodeBuffer(){
 	for (std::vector<string>::const_iterator it = buffer.begin(); it != buffer.end(); ++it) 
 	{
@@ -320,6 +328,17 @@ void CodeBuffer::doParamLast(std::string type, std::string val, std::vector<std:
     }
     std::string temp(genPReg());
     emit(temp + " = add i32 0, " + val);
+}
+
+void CodeBuffer::checkCase(std::string val, vector<std::pair<int, BranchLabelIndex>> &nCList,
+                           vector<std::pair<int, BranchLabelIndex>> &nList, vector<pair<int, BranchLabelIndex>> &sList) {
+    std::string cond(genReg());
+    int addr1 = emit(cond + " = icmp eq i32 #, " + val);
+    int addr2 = emit("br i1 " + cond + ", label @, label @");
+    sList = merge(sList, makelist(std::pair<int,BranchLabelIndex>(addr1, FIRST)));
+    nList = merge(nList, makelist(std::pair<int,BranchLabelIndex>(addr2, FIRST)));
+    nCList = merge(nCList, makelist(std::pair<int,BranchLabelIndex>(addr2, SECOND)));
+
 }
 
 // ******** Helper Methods ********** //

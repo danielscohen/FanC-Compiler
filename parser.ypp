@@ -51,7 +51,7 @@ Funcs :	/*epsilon*/													        {printProductionRule(2);}
 
 FuncDecl : /*{dprint("FuncDecl");}*/ RetType ID LPAREN Formals RPAREN LBRACE {noRet = true; prevDefCheck($2->name); addFunDef($1->name, $2->name, $4->pNames, $4->pTypes);
 																			BUFF.emit(std::string("define ") + ($1->name == "VOID" ? "void" : "i32") + " @" + $2->name + getpTypesStr($4->pTypes) + "{"); BUFF.genLabel(); initVarStack(); 
-																			} N Statements RBRACE 		{exitScope(); BUFF.bpatch($8->nextList, $9->label); if(!$9->nextList.empty()) BUFF.bpatch($9->nextList, BUFF.genLabel()); if(noRet && $1->name != "VOID") BUFF.emit("ret i32 0"); if(noRet && $1->name == "VOID") BUFF.emit("ret void"); BUFF.emit("}"); $$ = $9;}
+																			} N Statements RBRACE 		{exitScope(); BUFF.bpatch($8->nextList, $9->label); if(!$9->nextList.empty()) BUFF.bpatch($9->nextList, BUFF.genLabel()); if($1->name != "VOID") BUFF.emit("ret i32 0"); if($1->name == "VOID") BUFF.emit("ret void"); BUFF.emit("}"); $$ = $9;}
 ;
 
 RetType : Type 																{$$ = $1;}
@@ -70,14 +70,17 @@ FormalDecl : Type ID 														{$$ = new Formals($2->name, $1->name);}
 ;
 
 Statements : Statment 														{$$ = $1; }
-		   | Statements Statment 											{$$ = $1; BUFF.bpatch($1->nextList, $2->label); $$->nextList = $2->nextList; $$->breakList = BUFF.merge($1->breakList,$2->breakList);$$->contList = BUFF.merge($1->contList,$2->contList);}
+		   | Statements Statment 											{$$ = $1; BUFF.bpatch($1->nextList, $2->label); $$->nextList = $2->nextList; $$->breakList = BUFF.merge($1->breakList,$2->breakList);
+		   																		$$->trueList = BUFF.merge($1->trueList,$2->trueList);$$->falseList = BUFF.merge($1->falseList,$2->falseList);$$->contList = BUFF.merge($1->contList,$2->contList);}
+
 ;
 
 Statment : LBRACE {enterScope("");} Statements RBRACE 		{exitScope(); $$ = $3;}
 		 | M Type ID SC  														{$$ = new Exp(""); prevDefCheck($3->name); addVarToSymTable($2->name, $3->name, 0); initVar($3->name, "0"); $$->label = $1->label; $$->nextList = BUFF.makelist(addrPair(BUFF.emit("br label @"), FIRST));}
 		 | M Type ID ASSIGN Exp SC  											{$$ = new Exp(""); prevDefCheck($3->name); checkTypeMatch($2->name, $5->type); addVarToSymTable($2->name, $3->name, $5->val); initVar($3->name, getExpVal($5)); $$->label = $1->label; $$->nextList = BUFF.makelist(addrPair(BUFF.emit("br label @"), FIRST));}
 		 | M ID ASSIGN Exp SC 												{$$ = new Exp(""); checkTypeMatch(getTypeById($2->name), $4->type);  changeValOfVar($2->name, $4->val); initVar($2->name, getExpVal($4)); $$->label = $1->label; $$->nextList = BUFF.makelist(addrPair(BUFF.emit("br label @"), FIRST));}
-		 | M Call SC  															{$$ = $2; $$->label = $1->label; $$->nextList = BUFF.makelist(addrPair(BUFF.emit("br label @"), FIRST));}
+		 | M Call SC  															{$$ = $2; $$->label = $1->label; $$->nextList = BUFF.merge($2->falseList, BUFF.merge($2->trueList, BUFF.makelist(addrPair(BUFF.emit("br label @"), FIRST))));
+		 																		}
 		 | M RETURN SC 														{checkRetMatchesFunc(""); BUFF.emit("ret void"); $$ = new Exp(""); noRet = false;$$->label = $1->label;}
 		 | M RETURN Exp SC 													{checkRetMatchesFunc($3->type); BUFF.emit(std::string("ret i32 ") + getExpVal($3)); $$ = new Exp(""); noRet = false;$$->label = $1->label;}
 		 | M IF LPAREN Exp M1 RPAREN M2 Statment M3 %prec HELSE 				{BUFF.bpatch($4->trueList, $8->label); $$ = new Exp(""); auto temp = BUFF.makelist(addrPair(BUFF.emit("br label @"), FIRST));
@@ -91,7 +94,8 @@ Statment : LBRACE {enterScope("");} Statements RBRACE 		{exitScope(); $$ = $3;}
 																					$$ = new Exp(""); $$->nextList = BUFF.merge($4->falseList, $8->breakList); $$->label = $2->label;}	
 		 | M BREAK SC 														{checkBreak(); int addr = BUFF.emit("br label @"); $$ = new Exp(""); $$->breakList = BUFF.makelist(addrPair(addr, FIRST));$$->label = $1->label;}
 		 | M CONTINUE SC 														{checkContinue();  $$ = new Exp(""); $$->contList = BUFF.makelist(addrPair(BUFF.emit("br label @"), FIRST)); $$->label = $1->label;}
-		 | SWITCH LPAREN Exp {checkRelop($3, $3);} RPAREN LBRACE {enterScope("SWITCH");} CaseList RBRACE {exitScope();}                 {printProductionRule(26);}
+		 | M SWITCH LPAREN Exp {checkRelop($4, $4);} RPAREN LBRACE {enterScope("SWITCH");} CaseList RBRACE {exitScope();}                 {$$ = $9; BUFF.spatch($9->switchList, getExpVal($4)); 
+		 																																$$->nextList = BUFF.merge($9->nextList, $9->breakList); $$->breakList.clear(); $$->label = $1->label;}
 ;
 
 
@@ -151,11 +155,16 @@ Exp : LPAREN Exp RPAREN 													{$$ = $2;}
 																									$$->falseList = BUFF.makelist(addrPair(addr, SECOND)); }
 ;
 
-CaseList : CaseDecl CaseList	                                            {printProductionRule(48);}
-		 | CaseDecl	                                                        {printProductionRule(49);}
-		 | DEFAULT COLON Statements	                                        {printProductionRule(50);}
+CaseList : CaseDecl M CaseList	                                            {BUFF.bpatch($1->nextCaseList, $2->label); BUFF.bpatch($1->nextList, $3->label);
+																			$$ = new Exp(""); $$->label = $1->label; $$->contList = BUFF.merge($1->contList, $3->contList);
+																			$$->breakList = BUFF.merge($1->breakList, $3->breakList);$$->switchList = BUFF.merge($1->switchList, $3->switchList); $$->nextList = $3->nextList;}
+		 | CaseDecl	                                                        {$$ = $1; $$->nextList = BUFF.merge($1->nextList, $1->nextCaseList);}
+		 | DEFAULT COLON N Statements	                                        {$$ = $4; BUFF.bpatch($3->nextList, $4->label);}
 
-CaseDecl : CASE NUM COLON Statements	                                    {printProductionRule(51);}
+CaseDecl : CASE NUM COLON {$$ = new Exp(""); BUFF.checkCase(std::to_string($2->val), $2->nextCaseList, $2->nextList, $2->switchList);} Statements	  {$$ = $2;BUFF.bpatch($2->nextList, $5->label);
+																																$$->contList = $5->contList;$$->breakList = $5->breakList;
+																																$$->label = $5->label;$$->nextList = $5->nextList;}
+
 
 
 N : /* epsilon */															{$$ = new Exp(""); int addr = BUFF.emit("br label @"); $$->nextList = BUFF.makelist(addrPair(addr, FIRST));}											

@@ -35,20 +35,21 @@ label_30:
 %reg5 = load i32, i32* %reg6
 %reg7 = mul i32 %reg5, 5
 ret i32 %reg7
+ret i32 0
 }
 define void @main(){
-label_37:
+label_38:
 %lVars = alloca [50 x i32]
-br label %label_40
-label_40:
+br label %label_41
+label_41:
 %reg8 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
 store i32 3, i32* %reg8
-br label %label_44
-label_44:
+br label %label_45
+label_45:
 %reg9 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 1
 store i32 8, i32* %reg9
-br label %label_48
-label_48:
+br label %label_49
+label_49:
 %reg11 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 0
 %reg10 = load i32, i32* %reg11
 %preg_1_1 = add i32 0, %reg10
@@ -58,45 +59,45 @@ label_48:
 %reg14 = call i32 @func(i32 %preg_1_1, i32 %preg_1_2)
 %reg15 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 2
 store i32 %reg14, i32* %reg15
-br label %label_59
-label_59:
+br label %label_60
+label_60:
 %reg17 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 2
 %reg16 = load i32, i32* %reg17
 %preg_2_1 = add i32 0, %reg16
 call void @printi(i32 %preg_2_1)
-br label %label_65
-label_65:
-br label %label_67
-label_67:
+br label %label_66
+label_66:
+br label %label_68
+label_68:
 %reg19 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 3
 store i32 0, i32* %reg19
-br label %label_71
-label_71:
+br label %label_72
+label_72:
 %reg21 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 3
 %reg20 = load i32, i32* %reg21
 %preg_3_1 = add i32 0, %reg20
 call void @printi(i32 %preg_3_1)
-br label %label_77
-label_77:
-br label %label_97
-label_79:
+br label %label_78
+label_78:
+br label %label_98
+label_80:
 %preg_4_1 = getelementptr [20 x i8], [20 x i8]* @reg23, i32 0, i32 0
 call void @print(i8* %preg_4_1)
-br label %label_83
-label_83:
-br label %label_65
-label_85:
-br label %label_87
-label_87:
+br label %label_84
+label_84:
+br label %label_66
+label_86:
+br label %label_88
+label_88:
 %reg24 = getelementptr [50 x i32], [50 x i32]* %lVars, i32 0, i32 4
 store i32 5, i32* %reg24
-br label %label_91
-label_91:
+br label %label_92
+label_92:
 %preg_5_1 = getelementptr [20 x i8], [20 x i8]* @reg25, i32 0, i32 0
 call void @print(i8* %preg_5_1)
-br label %label_95
-label_95:
-br label %label_85
-label_97:
+br label %label_96
+label_96:
+br label %label_86
+label_98:
 ret void
 }

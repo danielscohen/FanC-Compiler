@@ -1,13 +1,8 @@
 
-bool printb(bool val) {
-    if (val) {
-        print("true");
-        return true;
-    }
-    print("false");
-    return false;
-}
 void main() {
-    bool a = printb(true);
+    switch(1){
+        case 2: print("wrong");
+        case 1: print("right");
+    }
 
 }

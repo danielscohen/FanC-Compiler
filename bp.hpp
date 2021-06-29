@@ -51,7 +51,8 @@ public:
 	bpatch(makelist({loc2,FIRST}),"my_true_label"); - location loc2 in the buffer will now contain the command "br i1 %cond, label @my_true_label, label %my_false_label"
 	*/
 	void bpatch(const vector<pair<int,BranchLabelIndex>>& address_list, const std::string &label);
-	
+    void spatch(const vector<pair<int,BranchLabelIndex>>& address_list, const std::string &label);
+
 	//prints the content of the code buffer to stdout
 	void printCodeBuffer();
 
@@ -80,6 +81,9 @@ public:
     std::string
     doFuncCall(int size, std::string name, std::string rType, std::vector<std::pair<int, BranchLabelIndex>>& tList,
                std::vector<std::pair<int, BranchLabelIndex>>& fList);
+    void checkCase(std::string val, std::vector<std::pair<int,BranchLabelIndex>>& nCList,
+                   std::vector<std::pair<int,BranchLabelIndex>>& nList,
+                   vector<pair<int, BranchLabelIndex>> &sList);
 
 };
 
